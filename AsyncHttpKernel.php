@@ -19,6 +19,7 @@ use Exception;
 use React\Promise\FulfilledPromise;
 use React\Promise\PromiseInterface;
 use React\Promise\RejectedPromise;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Exception\RequestExceptionInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -26,13 +27,14 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
-use Symfony\Component\HttpKernel\Event\FilterControllerArgumentsEvent;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\Exception\AsyncEventDispatcherNeededException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\ControllerDoesNotReturnResponseException;
@@ -56,13 +58,13 @@ class AsyncHttpKernel extends HttpKernel
     /**
      * AsyncHttpKernel constructor.
      *
-     * @param AsyncEventDispatcher           $dispatcher
+     * @param EventDispatcherInterface           $dispatcher
      * @param ControllerResolverInterface    $resolver
      * @param RequestStack|null              $requestStack
      * @param ArgumentResolverInterface|null $argumentResolver
      */
     public function __construct(
-        AsyncEventDispatcher $dispatcher,
+        EventDispatcherInterface $dispatcher,
         ControllerResolverInterface $resolver,
         RequestStack $requestStack = null,
         ArgumentResolverInterface $argumentResolver = null
@@ -87,47 +89,31 @@ class AsyncHttpKernel extends HttpKernel
     /**
      * Handles a Request to convert it to a Response.
      *
-     * When $catch is true, the implementation must catch all exceptions
-     * and do its best to convert them to a Response instance.
-     *
-     * @param Request $request A Request instance
-     * @param int     $type    The type of the request
-     *                         (one of HttpKernelInterface::MASTER_REQUEST or HttpKernelInterface::SUB_REQUEST)
-     * @param bool    $catch   Whether to catch exceptions or not
+     * @param Request $request
      *
      * @return PromiseInterface
-     *
-     * @throws \Exception When an Exception occurs during processing
      */
-    public function handleAsync(
-        Request $request,
-        $type = self::MASTER_REQUEST,
-        $catch = true
-    ): PromiseInterface {
-        if (!$this->dispatcher instanceof AsyncEventDispatcher) {
-            return new RejectedPromise(new AsyncEventDispatcherNeededException());
+    public function handleAsync(Request $request): PromiseInterface
+    {
+        if (!$this->dispatcher instanceof AsyncEventDispatcherInterface) {
+            return new RejectedPromise(
+                new AsyncEventDispatcherNeededException(
+                    sprintf('The EventDispathcer instance is not a valid %s instance. %s passed.', AsyncEventDispatcherInterface::class, get_class($this->dispatcher))
+                )
+            );
         }
 
         $request->headers->set('X-Php-Ob-Level', ob_get_level());
 
         return
-            $this->handleAsyncRaw(
-                $request,
-                $type
-            )
+            $this->handleAsyncRaw($request)
             ->then(null,
-                function (Throwable $exception) use ($request, $type, $catch) {
+                function (Throwable $exception) use ($request) {
                     if ($exception instanceof RequestExceptionInterface) {
                         $exception = new BadRequestHttpException($exception->getMessage(), $exception);
                     }
 
-                    if (false === $catch) {
-                        $this->finishRequestPromise($request, $type);
-
-                        throw $exception;
-                    }
-
-                    return $this->handleExceptionPromise($exception, $request, $type);
+                    return $this->handleExceptionPromise($exception, $request);
                 }
             );
     }
@@ -135,29 +121,21 @@ class AsyncHttpKernel extends HttpKernel
     /**
      * Handles a request to convert it to a response.
      *
-     * Exceptions are not caught.
-     *
-     * @param Request $request A Request instance
-     * @param int     $type    The type of the request (one of HttpKernelInterface::MASTER_REQUEST or HttpKernelInterface::SUB_REQUEST)
+     * @param Request $request
      *
      * @return PromiseInterface
-     *
-     * @throws \LogicException                     If one of the listener does not behave as expected
-     * @throws NotFoundHttpException               When controller cannot be found
-     * @throws AsyncEventDispatcherNeededException
      */
-    private function handleAsyncRaw(
-        Request $request,
-        int $type = self::MASTER_REQUEST
-    ): PromiseInterface {
+    private function handleAsyncRaw(Request $request): PromiseInterface
+    {
         $dispatcher = $this->dispatcher;
+        $type = self::MASTER_REQUEST;
 
         $this->requestStack->push($request);
-        $event = new GetResponseEvent($this, $request, $type);
+        $event = new RequestEvent($this, $request, $type);
 
         return $dispatcher
             ->asyncDispatch(KernelEvents::REQUEST, $event)
-            ->then(function (GetResponseEvent $event) use ($request, $type) {
+            ->then(function (RequestEvent $event) use ($request, $type) {
                 return $event->hasResponse()
                     ? $this->filterResponsePromise(
                         $event->getResponse(),
@@ -184,15 +162,15 @@ class AsyncHttpKernel extends HttpKernel
             );
         }
 
-        $event = new FilterControllerEvent($this, $controller, $request, $type);
-        $this->dispatcher->dispatch(KernelEvents::CONTROLLER, $event);
+        $event = new ControllerEvent($this, $controller, $request, $type);
+        $this->dispatcher->dispatch($event);
         $controller = $event->getController();
 
         // controller arguments
         $arguments = $this->argumentResolver->getArguments($request, $controller);
 
-        $event = new FilterControllerArgumentsEvent($this, $controller, $arguments, $request, $type);
-        $this->dispatcher->dispatch(KernelEvents::CONTROLLER_ARGUMENTS, $event);
+        $event = new ControllerArgumentsEvent($this, $controller, $arguments, $request, $type);
+        $this->dispatcher->dispatch($event);
         $controller = $event->getController();
         $arguments = $event->getArguments();
 
@@ -230,8 +208,8 @@ class AsyncHttpKernel extends HttpKernel
     ): PromiseInterface {
         return (new FulfilledPromise())
             ->then(function () use ($request, $response, $controller, $type) {
-                $event = new GetResponseForControllerResultEvent($this, $request, $type, $response);
-                $this->dispatcher->dispatch(KernelEvents::VIEW, $event);
+                $event = new ViewEvent($this, $request, $type, $response);
+                $this->dispatcher->dispatch($event, KernelEvents::VIEW);
 
                 if ($event->hasResponse()) {
                     return $event->getResponse();
@@ -260,7 +238,7 @@ class AsyncHttpKernel extends HttpKernel
      */
     private function filterResponsePromise(Response $response, Request $request, int $type)
     {
-        $event = new FilterResponseEvent($this, $request, $type, $response);
+        $event = new ResponseEvent($this, $request, $type, $response);
 
         return $this
             ->dispatcher
@@ -285,7 +263,7 @@ class AsyncHttpKernel extends HttpKernel
      */
     private function finishRequestPromise(Request $request, int $type)
     {
-        $this->dispatcher->dispatch(KernelEvents::FINISH_REQUEST, new FinishRequestEvent($this, $request, $type));
+        $this->dispatcher->dispatch(new FinishRequestEvent($this, $request, $type));
         $this->requestStack->pop();
     }
 
@@ -294,7 +272,6 @@ class AsyncHttpKernel extends HttpKernel
      *
      * @param Throwable $exception
      * @param Request   $request
-     * @param int       $type
      *
      * @return PromiseInterface
      *
@@ -302,8 +279,7 @@ class AsyncHttpKernel extends HttpKernel
      */
     private function handleExceptionPromise(
         Throwable $exception,
-        Request $request,
-        int $type
+        Request $request
     ): PromiseInterface {
         if (!$exception instanceof Exception) {
             $exception = new Exception(
@@ -312,12 +288,13 @@ class AsyncHttpKernel extends HttpKernel
             );
         }
 
-        $event = new GetResponseForExceptionEvent($this, $request, $type, $exception);
+        $type = self::MASTER_REQUEST;
+        $event = new ExceptionEvent($this, $request, $type, $exception);
 
         return $this
             ->dispatcher
             ->asyncDispatch(KernelEvents::EXCEPTION, $event)
-            ->then(function (GetResponseForExceptionEvent $event) use ($request, $type) {
+            ->then(function (ExceptionEvent $event) use ($request, $type) {
                 $exception = $event->getException();
                 if (!$event->hasResponse()) {
                     $this->finishRequestPromise($request, $type);

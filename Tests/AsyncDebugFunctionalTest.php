@@ -22,9 +22,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Class AsyncFunctionalTest.
+ * Class AsyncDebugFunctionalTest.
  */
-class AsyncFunctionalTest extends AsyncKernelFunctionalTest
+class AsyncDebugFunctionalTest extends AsyncKernelFunctionalTest
 {
     /**
      * Decorate configuration.
@@ -53,6 +53,16 @@ class AsyncFunctionalTest extends AsyncKernelFunctionalTest
         ];
 
         return $configuration;
+    }
+
+    /**
+     * Kernel in debug mode
+     *
+     * @return bool
+     */
+    protected static function debug(): bool
+    {
+        return true;
     }
 
     /**

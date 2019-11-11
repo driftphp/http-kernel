@@ -19,9 +19,9 @@ use React\Promise\FulfilledPromise;
 use React\Promise\PromiseInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\Event\ViewEvent;
 
 /**
  * Class Listener.
@@ -31,11 +31,11 @@ class Listener
     /**
      * Handle get Response.
      *
-     * @param GetResponseEvent $event
+     * @param RequestEvent $event
      *
      * @return PromiseInterface
      */
-    public function handleGetResponsePromiseA(GetResponseEvent $event)
+    public function handleGetResponsePromiseA(RequestEvent $event)
     {
         return (new FulfilledPromise())
             ->then(function () use ($event) {
@@ -46,11 +46,11 @@ class Listener
     /**
      * Handle get Response.
      *
-     * @param GetResponseEvent $event
+     * @param RequestEvent $event
      *
      * @return PromiseInterface
      */
-    public function handleGetResponsePromiseB(GetResponseEvent $event)
+    public function handleGetResponsePromiseB(RequestEvent $event)
     {
         return (new FulfilledPromise())
             ->then(function () use ($event) {
@@ -61,29 +61,29 @@ class Listener
     /**
      * Handle get Response.
      *
-     * @param GetResponseEvent $event
+     * @param RequestEvent $event
      */
-    public function handleGetResponsePromiseNothing(GetResponseEvent $event)
+    public function handleGetResponsePromiseNothing(RequestEvent $event)
     {
     }
 
     /**
      * Handle get Exception.
      *
-     * @param GetResponseForExceptionEvent $event
+     * @param ExceptionEvent $event
      */
-    public function handleGetExceptionNothing(GetResponseForExceptionEvent $event)
+    public function handleGetExceptionNothing(ExceptionEvent $event)
     {
     }
 
     /**
      * Handle get Exception.
      *
-     * @param GetResponseForExceptionEvent $event
+     * @param ExceptionEvent $event
      *
      * @return PromiseInterface
      */
-    public function handleGetExceptionA(GetResponseForExceptionEvent $event)
+    public function handleGetExceptionA(ExceptionEvent $event)
     {
         return (new FulfilledPromise())
             ->then(function () use ($event) {
@@ -94,11 +94,11 @@ class Listener
     /**
      * Handle get Response 1.
      *
-     * @param GetResponseEvent $event
+     * @param RequestEvent $event
      *
      * @return PromiseInterface
      */
-    public function handleGetResponsePromise1(GetResponseEvent $event): PromiseInterface
+    public function handleGetResponsePromise1(RequestEvent $event): PromiseInterface
     {
         return
             (new FulfilledPromise())
@@ -110,9 +110,9 @@ class Listener
     /**
      * Handle get Response 1.
      *
-     * @param GetResponseEvent $event
+     * @param RequestEvent $event
      */
-    public function handleGetResponsePromise2(GetResponseEvent $event)
+    public function handleGetResponsePromise2(RequestEvent $event)
     {
         $_GET['partial'] .= '2';
     }
@@ -120,9 +120,9 @@ class Listener
     /**
      * Handle get Response 1.
      *
-     * @param GetResponseEvent $event
+     * @param RequestEvent $event
      */
-    public function handleGetResponsePromise3(GetResponseEvent $event)
+    public function handleGetResponsePromise3(RequestEvent $event)
     {
         $_GET['partial'] .= '3';
     }
@@ -130,9 +130,9 @@ class Listener
     /**
      * Handle view.
      *
-     * @param GetResponseForControllerResultEvent $event
+     * @param ViewEvent $event
      */
-    public function handleView(GetResponseForControllerResultEvent $event)
+    public function handleView(ViewEvent $event)
     {
         $event->setResponse(new JsonResponse($event->getControllerResult()));
     }

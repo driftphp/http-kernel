@@ -102,7 +102,7 @@ abstract class AsyncKernelFunctionalTest extends BaseFunctionalTest
             ],
             static::decorateConfiguration($configuration),
             static::decorateRoutes($routes),
-            'dev', false
+            'dev', static::debug()
         );
     }
 
@@ -128,5 +128,15 @@ abstract class AsyncKernelFunctionalTest extends BaseFunctionalTest
     protected static function decorateRoutes(array $routes): array
     {
         return $routes;
+    }
+
+    /**
+     * Kernel in debug mode
+     *
+     * @return bool
+     */
+    protected static function debug(): bool
+    {
+        return false;
     }
 }

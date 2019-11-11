@@ -17,6 +17,7 @@ namespace Symfony\Component\HttpKernel;
 
 use React\EventLoop\LoopInterface;
 use React\Promise\PromiseInterface;
+use React\Promise\RejectedPromise;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -34,32 +35,19 @@ abstract class AsyncKernel extends Kernel implements CompilerPassInterface
      * When $catch is true, the implementation must catch all exceptions
      * and do its best to convert them to a Response instance.
      *
-     * @param Request $request A Request instance
-     * @param int     $type    The type of the request
-     *                         (one of HttpKernelInterface::MASTER_REQUEST or HttpKernelInterface::SUB_REQUEST)
-     * @param bool    $catch   Whether to catch exceptions or not
+     * @param Request $request
      *
      * @return PromiseInterface
-     *
-     * @throws \Exception When an Exception occurs during processing
      */
-    public function handleAsync(
-        Request $request,
-        $type = self::MASTER_REQUEST,
-        $catch = true
-    ): PromiseInterface {
-        $this->boot();
-
+    public function handleAsync(Request $request): PromiseInterface {
         $httpKernel = $this->getHttpKernel();
         if (!$httpKernel instanceof AsyncHttpKernel) {
-            throw new AsyncHttpKernelNeededException('In order to use this AsyncKernel, you need to have the HttpAsyncKernel installed');
+            return new RejectedPromise(
+                new AsyncHttpKernelNeededException('In order to use this AsyncKernel, you need to have the HttpAsyncKernel installed')
+            );
         }
 
-        return $httpKernel->handleAsync(
-            $request,
-            $type,
-            $catch
-        );
+        return $httpKernel->handleAsync($request);
     }
 
     /**
@@ -67,11 +55,12 @@ abstract class AsyncKernel extends Kernel implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
+
         if ($container->has('event_dispatcher')) {
-            $container
-                ->getDefinition('event_dispatcher')
-                ->setClass(AsyncEventDispatcher::class);
-        }
+            $this->isDebug()
+                ? $this->processEventDispatcherDebug($container)
+                : $this->processEventDispatcher($container);
+        };
 
         if ($container->has('http_kernel')) {
             $container
@@ -89,5 +78,31 @@ abstract class AsyncKernel extends Kernel implements CompilerPassInterface
         if ($container->has('reactphp.event_loop')) {
             $container->setAlias(LoopInterface::class, 'reactphp.event_loop');
         }
+    }
+
+    /**
+     * Process event dispatcher
+     *
+     * @param ContainerBuilder $container
+     */
+    private function processEventDispatcher(ContainerBuilder $container) {
+        $container
+            ->getDefinition('event_dispatcher')
+            ->setClass(AsyncEventDispatcher::class);
+
+        $container->setAlias(AsyncEventDispatcherInterface::class, 'event_dispatcher');
+    }
+
+    /**
+     * Process event dispatcher in debug
+     *
+     * @param ContainerBuilder $container
+     */
+    private function processEventDispatcherDebug(ContainerBuilder $container) {
+        $container
+            ->getDefinition('debug.event_dispatcher')
+            ->setClass(TraceableAsyncEventDispatcher::class);
+
+        $container->setAlias(AsyncEventDispatcherInterface::class, 'event_dispatcher');
     }
 }

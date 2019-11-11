@@ -18,12 +18,13 @@ namespace Symfony\Component\HttpKernel;
 use React\Promise\FulfilledPromise;
 use React\Promise\PromiseInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher;
 use Symfony\Component\HttpKernel\Event\KernelEvent;
 
 /**
- * Class AsyncEventDispatcher.
+ * Class TraceableAsyncEventDispatcher.
  */
-class AsyncEventDispatcher extends EventDispatcher implements AsyncEventDispatcherInterface
+class TraceableAsyncEventDispatcher extends TraceableEventDispatcher implements AsyncEventDispatcherInterface
 {
     /**
      * Dispatch an event asynchronously.

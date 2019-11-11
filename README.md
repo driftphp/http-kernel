@@ -3,13 +3,9 @@
 [![CircleCI](https://circleci.com/gh/apisearch-io/symfony-async-kernel.svg?style=svg)](https://circleci.com/gh/apisearch-io/symfony-async-kernel)
 [![Join the Slack](https://img.shields.io/badge/join%20us-on%20slack-blue.svg)](https://apisearch.slack.com)
 
-This package provides async features to the Symfony Kernel. This implementation
-uses [ReactPHP Promise](https://github.com/reactphp/promise) implementation for
-this purposes.
-
-> IMPORTANT !!!  
-> **You can take a look at the first Symfony example on top of this package at
-> [Symfony and ReactPHP Demo](https://github.com/apisearch-io/symfony-react-demo)**
+This package provides async features to the Symfony (+4.3) Kernel. This
+implementation uses [ReactPHP Promise](https://github.com/reactphp/promise) 
+library and paradigm for this purposes.
 
 ## Motivations
 
@@ -39,7 +35,7 @@ this repository will not change your original project behavior.
 ```yml
 {
   "require": {
-    "apisearch-io/symfony-async-http-kernel": "^0.1"
+    "drift/http-kernel": "dev-master"
   }
 }
 ```
