@@ -14,7 +14,7 @@
 
         "symfony/http-kernel": "^4.3 || ^5.0",
         "symfony/dependency-injection": "^4.3 || ^5.0",
-        "symfony/contracts": "^2.0",
+        "symfony/contracts": "^1.1.8 || ^2.0",
         "react/promise": "*"
     },
     "require-dev": {
