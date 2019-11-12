@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace Drift\HttpKernel\Tests;
 
+use Mmoreram\BaseBundle\Kernel\DriftBaseKernel;
 use Mmoreram\BaseBundle\Tests\BaseFunctionalTest;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Drift\HttpKernel\AsyncEventDispatcher;
@@ -95,7 +96,7 @@ abstract class AsyncKernelFunctionalTest extends BaseFunctionalTest
             ],
         ];
 
-        return new AsyncTestKernel(
+        return new DriftBaseKernel(
             [
                 FrameworkBundle::class,
             ],
