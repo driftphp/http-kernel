@@ -7,8 +7,20 @@ jobs:
     working_directory: ~/project
     steps:
       - checkout
+
       - run:
-          name: Run tests
+          name: Install PHPUnit
           command: |
-            composer install -n --prefer-dist --no-suggest
-            composer test
+            composer require phpunit/phpunit:7.*
+
+      - run:
+          name: Run tests / Symfony 4^3
+          command: |
+            composer update -n --prefer-dist --prefer-stable --no-suggest
+            php vendor/bin/phpunit
+
+      - run:
+          name: Run tests / Symfony 5^0
+          command: |
+            composer update -n --prefer-dist --no-suggest
+            php vendor/bin/phpunit
