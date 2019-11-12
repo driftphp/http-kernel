@@ -5,7 +5,7 @@ namespace Drift\HttpKernel;
 
 use React\Promise\FulfilledPromise;
 use React\Promise\PromiseInterface;
-use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Component\HttpKernel\Event\KernelEvent as Event;
 
 /**
  * Trait AsyncEventDispatcherMethods

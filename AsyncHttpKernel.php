@@ -31,6 +31,7 @@ use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
+use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
@@ -296,7 +297,12 @@ class AsyncHttpKernel extends HttpKernel
             ->dispatcher
             ->asyncDispatch(KernelEvents::EXCEPTION, $event)
             ->then(function (ExceptionEvent $event) use ($request, $type) {
-                $throwable = $event->getThrowable();
+
+                // Supporting both 4.3 and 5.0
+                $throwable = ($event instanceof GetResponseForExceptionEvent)
+                    ? $event->getException()
+                    : $event->getThrowable();
+
                 if (!$event->hasResponse()) {
                     $this->finishRequestPromise($request, $type);
 

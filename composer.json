@@ -18,7 +18,6 @@
         "react/promise": "*"
     },
     "require-dev": {
-        "phpunit/phpunit": "^7.0.0",
         "mmoreram/symfony-bundle-dependencies": "^2.2.0",
         "mmoreram/base-bundle": "^1.0.10",
         "symfony/yaml": "^5.0",
@@ -32,17 +31,6 @@
         },
         "exclude-from-classmap": [
             "/Tests/"
-        ]
-    },
-    "scripts": {
-        "fix-code": [
-            "vendor/bin/php-cs-fixer fix --config=.php_cs",
-            "vendor/bin/php-formatter f:h:f . --exclude=vendor --exclude=var",
-            "vendor/bin/php-formatter f:s:f . --exclude=vendor --exclude=var",
-            "vendor/bin/php-formatter f:u:s . --exclude=vendor --exclude=var"
-        ],
-        "test": [
-            "vendor/bin/phpunit"
         ]
     },
     "minimum-stability": "dev",

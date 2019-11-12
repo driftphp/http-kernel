@@ -5,8 +5,8 @@ namespace Drift\HttpKernel;
 
 
 use React\Promise\PromiseInterface;
+use Symfony\Component\HttpKernel\Event\KernelEvent as Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Interface AsyncEventDispatcherInterface
@@ -34,7 +34,7 @@ interface AsyncEventDispatcherInterface extends EventDispatcherInterface
      *
      * @param callable[] $listeners
      * @param string $eventName
-     * @param KernelEvent $event
+     * @param Event $event
      *
      * @return PromiseInterface
      */
