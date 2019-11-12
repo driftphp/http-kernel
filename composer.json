@@ -1,5 +1,5 @@
 {
-    "name": "apisearch-io/symfony-async-http-kernel",
+    "name": "drift/http-kernel",
     "description": "Http Kernel component for Drift, based on Symfony Http Kernel component",
     "type": "library",
     "license": "MIT",
