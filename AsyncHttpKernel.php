@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace Drift\HttpKernel;
 
+use Drift\HttpKernel\Exception\AsyncEventDispatcherNeededException;
 use Exception;
 use React\Promise\FulfilledPromise;
 use React\Promise\PromiseInterface;
@@ -35,7 +36,6 @@ use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
-use Symfony\Component\HttpKernel\Exception\AsyncEventDispatcherNeededException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\ControllerDoesNotReturnResponseException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;

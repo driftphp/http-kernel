@@ -13,7 +13,7 @@
 
 declare(strict_types=1);
 
-namespace Symfony\Component\HttpKernel\Exception;
+namespace Drift\HttpKernel\Exception;
 
 use Exception;
 

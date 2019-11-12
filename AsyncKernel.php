@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace Drift\HttpKernel;
 
+use Drift\HttpKernel\Exception\AsyncHttpKernelNeededException;
 use React\EventLoop\LoopInterface;
 use React\Promise\PromiseInterface;
 use React\Promise\RejectedPromise;
@@ -22,7 +23,6 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\AsyncHttpKernelNeededException;
 use Symfony\Component\HttpKernel\Kernel;
 
 /**
