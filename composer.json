@@ -18,7 +18,7 @@
     },
     "require-dev": {
         "mmoreram/symfony-bundle-dependencies": "^2.2.0",
-        "mmoreram/base-bundle": "^1.0.10",
+        "mmoreram/base-bundle": "dev-master@dev",
         "symfony/yaml": "^5.0",
         "symfony/console": "^5.0",
         "symfony/stopwatch": "^5.0",
