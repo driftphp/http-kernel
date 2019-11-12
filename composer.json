@@ -12,8 +12,8 @@
     "require": {
         "php": "^7.2.9",
 
-        "symfony/http-kernel": "^5.0",
-        "symfony/dependency-injection": "^5.0",
+        "symfony/http-kernel": "^4.3 || ^5.0",
+        "symfony/dependency-injection": "^4.3 || ^5.0",
         "symfony/contracts": "^2.0",
         "react/promise": "*"
     },

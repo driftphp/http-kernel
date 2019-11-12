@@ -44,7 +44,7 @@ application asynchronous-friendly by changing your kernel implementation, from
 the Symfony regular HTTP Kernel class, to the new Async one.
 
 ```php
-use Symfony\Component\HttpKernel\AsyncKernel;
+use Drift\HttpKernel\AsyncKernel;
 
 class Kernel extends AsyncKernel
 {
