@@ -13,7 +13,7 @@
 
 declare(strict_types=1);
 
-namespace Symfony\Component\HttpKernel\Tests;
+namespace Drift\HttpKernel\Tests;
 
 use React\Promise\FulfilledPromise;
 use React\Promise\PromiseInterface;

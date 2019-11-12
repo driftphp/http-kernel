@@ -13,7 +13,7 @@
 
 declare(strict_types=1);
 
-namespace Symfony\Component\HttpKernel\Tests;
+namespace Drift\HttpKernel\Tests;
 
 use Clue\React\Block;
 use Exception;
@@ -69,6 +69,7 @@ class GetResponsePromiseFunctionalTest extends AsyncKernelFunctionalTest
             ->handleAsync(new Request([], [], [], [], [], [
                 'REQUEST_METHOD' => 'GET',
                 'REQUEST_URI' => '/promise',
+                'SERVER_PORT' => 80,
             ]))
             ->then(function (Response $response) {
                 $this->assertEquals(
@@ -81,6 +82,7 @@ class GetResponsePromiseFunctionalTest extends AsyncKernelFunctionalTest
             ->handleAsync(new Request([], [], [], [], [], [
                 'REQUEST_METHOD' => 'GET',
                 'REQUEST_URI' => '/promise-exception',
+                'SERVER_PORT' => 80,
             ]))
             ->then(null, function (Exception $exception) {
                 $this->assertEquals(

@@ -3,7 +3,7 @@ services:
   _defaults:
     autowire: true
     autoconfigure: true
-
-  Symfony\Component\HttpKernel\Tests\:
-    resource: '.'
     public: true
+
+  Drift\HttpKernel\Tests\Services\:
+    resource: 'Services/.'

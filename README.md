@@ -109,11 +109,11 @@ fulfilled.
 /**
  * Handle get Response.
  *
- * @param GetResponseEvent $event
+ * @param ResponseEvent $event
  *
  * @return PromiseInterface
  */
-public function handleGetResponsePromiseA(GetResponseEvent $event)
+public function handleGetResponsePromiseA(ResponseEvent $event)
 {
     $promise = (new FulfilledPromise())
         ->then(function () use ($event) {
@@ -130,39 +130,3 @@ public function handleGetResponsePromiseA(GetResponseEvent $event)
     return $promise;
 }
 ```
-
-## Domain
-
-Your domain is always your responsibility. In that case, this new kernel allow
-you to work with real asynchronous I/O operations (otherwise, only would allow
-you temporary parallel operations, like many I/O calls at the same time, but
-this is something rare. Very rare). Here you have some libraries you can work
-with in your common I/O operations
-
-- Mysql - https://github.com/friends-of-reactphp/mysql
-- RabbitMQ - https://github.com/jakubkulhan/bunny
-- Filesystem - https://github.com/reactphp/filesystem
-- Http Client - https://github.com/reactphp/http-client
-- Redis - https://github.com/clue/reactphp-redis
-
-All these libraries will not return you values, but promises.
-
-## ReactPHP Server
-
-In order to use ReactPHP in the whole application you must use a ReactPHP based
-HTTP Server that uses this Async Kernel. You can take a look at the Symfony
-ReactPHP Server and start a new server
-
-- [Symfony ReactPHP Server](https://github.com/apisearch-io/symfony-react-server)
-
-You can take a look at the 
-[Symfony + ReactPHP Series](https://medium.com/@apisearch/symfony-and-reactphp-series-82082167f6fb)
-in order to understand a little bit better the rationale behind using this
-server and Promises in your domain.
-
-```bash
-php vendor/bin/server 0.0.0.0:8100 --non-blocking
-```
-
-> Your project may place the vendor bins in another folder, so please, check
-> your path if this default option does not work

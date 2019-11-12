@@ -13,7 +13,7 @@
 
 declare(strict_types=1);
 
-namespace Symfony\Component\HttpKernel\Tests;
+namespace Drift\HttpKernel\Tests;
 
 use Exception;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,6 +31,7 @@ class SyncFunctionalTest extends AsyncKernelFunctionalTest
         $request = new Request([], [], [], [], [], [
             'REQUEST_METHOD' => 'GET',
             'REQUEST_URI' => '/value',
+            'SERVER_PORT' => 80,
         ]);
 
         $this->assertEquals(
@@ -41,6 +42,7 @@ class SyncFunctionalTest extends AsyncKernelFunctionalTest
         $request = new Request([], [], [], [], [], [
             'REQUEST_METHOD' => 'GET',
             'REQUEST_URI' => '/exception',
+            'SERVER_PORT' => 80,
         ]);
 
         try {

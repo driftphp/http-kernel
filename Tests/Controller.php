@@ -13,7 +13,7 @@
 
 declare(strict_types=1);
 
-namespace Symfony\Component\HttpKernel\Tests;
+namespace Drift\HttpKernel\Tests;
 
 use Exception;
 use React\Promise\FulfilledPromise;

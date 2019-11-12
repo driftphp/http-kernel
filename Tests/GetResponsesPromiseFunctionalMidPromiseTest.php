@@ -13,7 +13,7 @@
 
 declare(strict_types=1);
 
-namespace Symfony\Component\HttpKernel\Tests;
+namespace Drift\HttpKernel\Tests;
 
 use Clue\React\Block;
 use React\EventLoop\StreamSelectLoop;
@@ -83,6 +83,7 @@ class GetResponsesPromiseFunctionalMidPromiseTest extends AsyncKernelFunctionalT
         $request = new Request([], [], [], [], [], [
             'REQUEST_METHOD' => 'GET',
             'REQUEST_URI' => '/promise',
+            'SERVER_PORT' => 80,
         ]);
 
         $_GET['partial'] = '';

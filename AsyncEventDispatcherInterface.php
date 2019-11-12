@@ -1,12 +1,12 @@
 <?php
 
 
-namespace Symfony\Component\HttpKernel;
+namespace Drift\HttpKernel;
 
 
 use React\Promise\PromiseInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpKernel\Event\KernelEvent;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Interface AsyncEventDispatcherInterface
@@ -17,13 +17,13 @@ interface AsyncEventDispatcherInterface extends EventDispatcherInterface
      * Dispatch an event asynchronously.
      *
      * @param string $eventName
-     * @param KernelEvent $event
+     * @param Event $event
      *
      * @return PromiseInterface
      */
     public function asyncDispatch(
         string $eventName,
-        KernelEvent $event
+        Event $event
     );
 
     /**
@@ -41,6 +41,6 @@ interface AsyncEventDispatcherInterface extends EventDispatcherInterface
     public function doAsyncDispatch(
         array $listeners,
         string $eventName,
-        KernelEvent $event
+        Event $event
     );
 }

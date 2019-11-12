@@ -13,7 +13,7 @@
 
 declare(strict_types=1);
 
-namespace Symfony\Component\HttpKernel;
+namespace Drift\HttpKernel;
 
 use React\EventLoop\LoopInterface;
 use React\Promise\PromiseInterface;
@@ -23,6 +23,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AsyncHttpKernelNeededException;
+use Symfony\Component\HttpKernel\Kernel;
 
 /**
  * Class AsyncKernel.
@@ -99,6 +100,10 @@ abstract class AsyncKernel extends Kernel implements CompilerPassInterface
      * @param ContainerBuilder $container
      */
     private function processEventDispatcherDebug(ContainerBuilder $container) {
+        if (!$container->hasDefinition('debug.event_dispatcher')) {
+            return;
+        }
+
         $container
             ->getDefinition('debug.event_dispatcher')
             ->setClass(TraceableAsyncEventDispatcher::class);

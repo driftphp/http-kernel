@@ -13,70 +13,14 @@
 
 declare(strict_types=1);
 
-namespace Symfony\Component\HttpKernel;
+namespace Drift\HttpKernel;
 
-use React\Promise\FulfilledPromise;
-use React\Promise\PromiseInterface;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher;
-use Symfony\Component\HttpKernel\Event\KernelEvent;
 
 /**
  * Class TraceableAsyncEventDispatcher.
  */
 class TraceableAsyncEventDispatcher extends TraceableEventDispatcher implements AsyncEventDispatcherInterface
 {
-    /**
-     * Dispatch an event asynchronously.
-     *
-     * @param string      $eventName
-     * @param KernelEvent $event
-     *
-     * @return PromiseInterface
-     */
-    public function asyncDispatch(
-        string $eventName,
-        KernelEvent $event
-    ) {
-        if ($listeners = $this->getListeners($eventName)) {
-            return $this->doAsyncDispatch($listeners, $eventName, $event);
-        }
-
-        return new FulfilledPromise($event);
-    }
-
-    /**
-     * Triggers the listeners of an event.
-     *
-     * This method can be overridden to add functionality that is executed
-     * for each listener.
-     *
-     * @param callable[]  $listeners
-     * @param string      $eventName
-     * @param KernelEvent $event
-     *
-     * @return PromiseInterface
-     */
-    public function doAsyncDispatch(
-        array $listeners,
-        string $eventName,
-        KernelEvent $event
-    ) {
-        $promise = new FulfilledPromise();
-        foreach ($listeners as $listener) {
-            $promise = $promise->then(function () use ($event, $eventName, $listener) {
-                return
-                    (new FulfilledPromise())
-                        ->then(function () use ($event, $eventName, $listener) {
-                            return $event->isPropagationStopped()
-                                ? new FulfilledPromise()
-                                : $listener($event, $eventName, $this);
-                        });
-            });
-        }
-
-        return $promise->then(function () use ($event) {
-            return $event;
-        });
-    }
+    use AsyncEventDispatcherMethods;
 }

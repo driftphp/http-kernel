@@ -1,11 +1,11 @@
 <?php
 
 
-namespace Symfony\Component\HttpKernel\Tests;
+namespace Drift\HttpKernel\Tests\Services;
 
-use Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcherInterface;
+use Drift\HttpKernel\AsyncEventDispatcherInterface;
+use Drift\HttpKernel\TraceableAsyncEventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpKernel\AsyncEventDispatcherInterface;
 
 /**
  * Class AService
@@ -27,6 +27,6 @@ final class AService
     )
     {
         $this->equal = ($dispatcher1 === $dispatcher2);
-        $this->isTraceable = ($dispatcher2 instanceof TraceableEventDispatcherInterface);
+        $this->isTraceable = ($dispatcher2 instanceof TraceableAsyncEventDispatcher);
     }
 }

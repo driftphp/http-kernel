@@ -13,7 +13,7 @@
 
 declare(strict_types=1);
 
-namespace Symfony\Component\HttpKernel;
+namespace Drift\HttpKernel;
 
 use Exception;
 use React\Promise\FulfilledPromise;
@@ -30,7 +30,6 @@ use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
@@ -40,6 +39,8 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\ControllerDoesNotReturnResponseException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\HttpKernel;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Throwable;
 
 /**
@@ -243,7 +244,7 @@ class AsyncHttpKernel extends HttpKernel
         return $this
             ->dispatcher
             ->asyncDispatch(KernelEvents::RESPONSE, $event)
-            ->then(function (FilterResponseEvent $event) use ($request, $type) {
+            ->then(function (ResponseEvent $event) use ($request, $type) {
                 $this->finishRequestPromise($request, $type);
 
                 return $event->getResponse();
@@ -295,19 +296,19 @@ class AsyncHttpKernel extends HttpKernel
             ->dispatcher
             ->asyncDispatch(KernelEvents::EXCEPTION, $event)
             ->then(function (ExceptionEvent $event) use ($request, $type) {
-                $exception = $event->getException();
+                $throwable = $event->getThrowable();
                 if (!$event->hasResponse()) {
                     $this->finishRequestPromise($request, $type);
 
-                    throw $event->getException();
+                    throw $throwable;
                 } else {
                     $response = $event->getResponse();
                     if (!$event->isAllowingCustomResponseCode() && !$response->isClientError() && !$response->isServerError() && !$response->isRedirect()) {
                         // ensure that we actually have an error response
-                        if ($exception instanceof HttpExceptionInterface) {
+                        if ($throwable instanceof HttpExceptionInterface) {
                             // keep the HTTP status code and headers
-                            $response->setStatusCode($exception->getStatusCode());
-                            $response->headers->add($exception->getHeaders());
+                            $response->setStatusCode($throwable->getStatusCode());
+                            $response->headers->add($throwable->getHeaders());
                         } else {
                             $response->setStatusCode(500);
                         }

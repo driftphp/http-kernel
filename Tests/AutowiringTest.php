@@ -1,7 +1,9 @@
 <?php
 
 
-namespace Symfony\Component\HttpKernel\Tests;
+namespace Drift\HttpKernel\Tests;
+
+use Drift\HttpKernel\Tests\Services\AService;
 
 /**
  * Class AutowiringTest

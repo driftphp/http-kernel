@@ -13,13 +13,12 @@
 
 declare(strict_types=1);
 
-namespace Symfony\Component\HttpKernel\Tests;
+namespace Drift\HttpKernel\Tests;
 
-use Mmoreram\BaseBundle\Kernel\AsyncBaseKernel;
 use Mmoreram\BaseBundle\Tests\BaseFunctionalTest;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
-use Symfony\Component\HttpKernel\AsyncEventDispatcher;
-use Symfony\Component\HttpKernel\AsyncHttpKernel;
+use Drift\HttpKernel\AsyncEventDispatcher;
+use Drift\HttpKernel\AsyncHttpKernel;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
@@ -96,7 +95,7 @@ abstract class AsyncKernelFunctionalTest extends BaseFunctionalTest
             ],
         ];
 
-        return new AsyncBaseKernel(
+        return new AsyncTestKernel(
             [
                 FrameworkBundle::class,
             ],
