@@ -17,6 +17,8 @@ namespace Drift\HttpKernel\Tests;
 
 use Mmoreram\BaseBundle\Kernel\DriftBaseKernel;
 use Mmoreram\BaseBundle\Tests\BaseFunctionalTest;
+use React\EventLoop\Factory;
+use React\EventLoop\LoopInterface;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Drift\HttpKernel\AsyncEventDispatcher;
 use Drift\HttpKernel\AsyncHttpKernel;
@@ -65,6 +67,14 @@ abstract class AsyncKernelFunctionalTest extends BaseFunctionalTest
                         ['name' => 'container.hot_path'],
                     ],
                 ],
+                'reactphp.event_loop' => [
+                    'class' => LoopInterface::class,
+                    'public' => true,
+                    'factory' => [
+                        Factory::class,
+                        'create'
+                    ]
+                ]
             ],
         ];
 

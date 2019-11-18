@@ -17,11 +17,13 @@ namespace Drift\HttpKernel;
 
 use Drift\HttpKernel\Exception\AsyncHttpKernelNeededException;
 use React\EventLoop\LoopInterface;
+use React\Filesystem\Filesystem;
 use React\Promise\PromiseInterface;
 use React\Promise\RejectedPromise;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Kernel;
 
@@ -35,12 +37,9 @@ abstract class AsyncKernel extends Kernel implements CompilerPassInterface
      *
      * When $catch is true, the implementation must catch all exceptions
      * and do its best to convert them to a Response instance.
-     *
-     * @param Request $request
-     *
-     * @return PromiseInterface
      */
-    public function handleAsync(Request $request): PromiseInterface {
+    public function handleAsync(Request $request): PromiseInterface
+    {
         $httpKernel = $this->getHttpKernel();
         if (!$httpKernel instanceof AsyncHttpKernel) {
             return new RejectedPromise(
@@ -56,12 +55,11 @@ abstract class AsyncKernel extends Kernel implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-
         if ($container->has('event_dispatcher')) {
             $this->isDebug()
                 ? $this->processEventDispatcherDebug($container)
                 : $this->processEventDispatcher($container);
-        };
+        }
 
         if ($container->has('http_kernel')) {
             $container
@@ -78,15 +76,34 @@ abstract class AsyncKernel extends Kernel implements CompilerPassInterface
 
         if ($container->has('reactphp.event_loop')) {
             $container->setAlias(LoopInterface::class, 'reactphp.event_loop');
+            $container->setAlias('event_loop', 'reactphp.event_loop');
+            $container->setAlias('drift.event_loop', 'reactphp.event_loop');
+        }
+
+        /*
+         * Create a filesystem instance
+         */
+        if (!$container->has('drift.filesystem')) {
+            $filesystem = new Definition(Filesystem::class, [
+                new Reference('drift.event_loop'),
+            ]);
+
+            $filesystem->setFactory([
+                Filesystem::class,
+                'create',
+            ]);
+
+            $filesystem->setPublic(true);
+            $container->setDefinition('drift.filesystem', $filesystem);
+            $container->setAlias(Filesystem::class, 'drift.filesystem');
         }
     }
 
     /**
-     * Process event dispatcher
-     *
-     * @param ContainerBuilder $container
+     * Process event dispatcher.
      */
-    private function processEventDispatcher(ContainerBuilder $container) {
+    private function processEventDispatcher(ContainerBuilder $container)
+    {
         $container
             ->getDefinition('event_dispatcher')
             ->setClass(AsyncEventDispatcher::class);
@@ -95,11 +112,10 @@ abstract class AsyncKernel extends Kernel implements CompilerPassInterface
     }
 
     /**
-     * Process event dispatcher in debug
-     *
-     * @param ContainerBuilder $container
+     * Process event dispatcher in debug.
      */
-    private function processEventDispatcherDebug(ContainerBuilder $container) {
+    private function processEventDispatcherDebug(ContainerBuilder $container)
+    {
         if (!$container->hasDefinition('debug.event_dispatcher')) {
             return;
         }
