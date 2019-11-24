@@ -100,7 +100,7 @@ class AsyncHttpKernel extends HttpKernel
         if (!$this->dispatcher instanceof AsyncEventDispatcherInterface) {
             return new RejectedPromise(
                 new AsyncEventDispatcherNeededException(
-                    sprintf('The EventDispathcer instance is not a valid %s instance. %s passed.', AsyncEventDispatcherInterface::class, get_class($this->dispatcher))
+                    sprintf('The EventDispatcher instance is not a valid %s instance. %s passed.', AsyncEventDispatcherInterface::class, get_class($this->dispatcher))
                 )
             );
         }
