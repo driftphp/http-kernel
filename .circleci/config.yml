@@ -11,16 +11,23 @@ jobs:
       - run:
           name: Install PHPUnit
           command: |
-            composer require phpunit/phpunit:7.*
+            composer require phpunit/phpunit:7.5.17 --no-update
 
       - run:
           name: Run tests / Symfony 4^3
           command: |
-            composer update -n --prefer-dist --prefer-stable --no-suggest
-            php vendor/bin/phpunit
+            composer update -n --prefer-dist --prefer-lowest --no-suggest
+            php vendor/bin/phpunit --testsuite=base
 
       - run:
           name: Run tests / Symfony 5^0
           command: |
             composer update -n --prefer-dist --no-suggest
-            php vendor/bin/phpunit
+            php vendor/bin/phpunit --testsuite=base
+
+      - run:
+          name: Run tests / No Stopwatch
+          command: |
+            composer require symfony/stopwatch:^5.0
+            composer update -n --prefer-dist --no-suggest
+            php vendor/bin/phpunit --testsuite=no-stopwatch

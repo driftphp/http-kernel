@@ -1,15 +1,26 @@
 <?php
 
+/*
+ * This file is part of the Drift Http Kernel
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * Feel free to edit as you please, and have fun.
+ *
+ * @author Marc Morera <yuhu@mmoreram.com>
+ */
+
+declare(strict_types=1);
 
 namespace Drift\HttpKernel;
 
-
 use React\Promise\PromiseInterface;
-use Symfony\Component\HttpKernel\Event\KernelEvent as Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpKernel\Event\KernelEvent as Event;
 
 /**
- * Interface AsyncEventDispatcherInterface
+ * Interface AsyncEventDispatcherInterface.
  */
 interface AsyncEventDispatcherInterface extends EventDispatcherInterface
 {
@@ -17,7 +28,7 @@ interface AsyncEventDispatcherInterface extends EventDispatcherInterface
      * Dispatch an event asynchronously.
      *
      * @param string $eventName
-     * @param Event $event
+     * @param Event  $event
      *
      * @return PromiseInterface
      */
@@ -33,8 +44,8 @@ interface AsyncEventDispatcherInterface extends EventDispatcherInterface
      * for each listener.
      *
      * @param callable[] $listeners
-     * @param string $eventName
-     * @param Event $event
+     * @param string     $eventName
+     * @param Event      $event
      *
      * @return PromiseInterface
      */

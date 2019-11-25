@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the Symfony Async Kernel
+ * This file is part of the Drift Http Kernel
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -13,19 +13,20 @@
 
 declare(strict_types=1);
 
-namespace Drift\HttpKernel\Tests;
+namespace Drift\HttpKernel\Tests\Base;
 
 use Clue\React\Block;
-use Exception;
+use Drift\HttpKernel\Tests\AsyncKernelFunctionalTest;
+use Drift\HttpKernel\Tests\Listener;
 use React\EventLoop\StreamSelectLoop;
 use React\Promise;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Class GetResponsePromiseFunctionalTest.
+ * Class AsyncFunctionalTest.
  */
-class GetResponsePromiseFunctionalTest extends AsyncKernelFunctionalTest
+class AsyncFunctionalTest extends AsyncKernelFunctionalTest
 {
     /**
      * Decorate configuration.
@@ -43,12 +44,12 @@ class GetResponsePromiseFunctionalTest extends AsyncKernelFunctionalTest
                 [
                     'name' => 'kernel.event_listener',
                     'event' => 'kernel.request',
-                    'method' => 'handleGetResponsePromiseA',
+                    'method' => 'handleGetResponsePromiseNothing',
                 ],
                 [
                     'name' => 'kernel.event_listener',
                     'event' => 'kernel.exception',
-                    'method' => 'handleGetExceptionA',
+                    'method' => 'handleGetExceptionNothing',
                 ],
             ],
         ];
@@ -58,8 +59,6 @@ class GetResponsePromiseFunctionalTest extends AsyncKernelFunctionalTest
 
     /**
      * Everything should work as before in the world of sync requests.
-     *
-     * @group lele
      */
     public function testSyncKernel()
     {
@@ -73,7 +72,7 @@ class GetResponsePromiseFunctionalTest extends AsyncKernelFunctionalTest
             ]))
             ->then(function (Response $response) {
                 $this->assertEquals(
-                    'A',
+                    'Y',
                     $response->getContent()
                 );
             });
@@ -84,15 +83,10 @@ class GetResponsePromiseFunctionalTest extends AsyncKernelFunctionalTest
                 'REQUEST_URI' => '/promise-exception',
                 'SERVER_PORT' => 80,
             ]))
-            ->then(null, function (Exception $exception) {
+            ->then(null, function (\Throwable $exception) {
                 $this->assertEquals(
-                    'EXC',
+                    'E2',
                     $exception->getMessage()
-                );
-
-                $this->assertEquals(
-                    404,
-                    $exception->getCode()
                 );
             });
 

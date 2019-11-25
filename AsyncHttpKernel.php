@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the Symfony Async Kernel
+ * This file is part of the Drift Http Kernel
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -60,7 +60,7 @@ class AsyncHttpKernel extends HttpKernel
     /**
      * AsyncHttpKernel constructor.
      *
-     * @param EventDispatcherInterface           $dispatcher
+     * @param EventDispatcherInterface       $dispatcher
      * @param ControllerResolverInterface    $resolver
      * @param RequestStack|null              $requestStack
      * @param ArgumentResolverInterface|null $argumentResolver
@@ -159,9 +159,7 @@ class AsyncHttpKernel extends HttpKernel
     private function callAsyncController(Request $request, int $type): PromiseInterface
     {
         if (false === $controller = $this->resolver->getController($request)) {
-            throw new NotFoundHttpException(
-                sprintf('Unable to find the controller for path "%s". The route is wrongly configured.', $request->getPathInfo())
-            );
+            throw new NotFoundHttpException(sprintf('Unable to find the controller for path "%s". The route is wrongly configured.', $request->getPathInfo()));
         }
 
         $event = new ControllerEvent($this, $controller, $request, $type);
@@ -297,7 +295,6 @@ class AsyncHttpKernel extends HttpKernel
             ->dispatcher
             ->asyncDispatch(KernelEvents::EXCEPTION, $event)
             ->then(function (ExceptionEvent $event) use ($request, $type) {
-
                 // Supporting both 4.3 and 5.0
                 $throwable = ($event instanceof GetResponseForExceptionEvent)
                     ? $event->getException()
