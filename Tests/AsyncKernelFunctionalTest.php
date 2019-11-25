@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the Symfony Async Kernel
+ * This file is part of the Drift Http Kernel
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -15,13 +15,13 @@ declare(strict_types=1);
 
 namespace Drift\HttpKernel\Tests;
 
+use Drift\HttpKernel\AsyncEventDispatcher;
+use Drift\HttpKernel\AsyncHttpKernel;
 use Mmoreram\BaseBundle\Kernel\DriftBaseKernel;
 use Mmoreram\BaseBundle\Tests\BaseFunctionalTest;
 use React\EventLoop\Factory;
 use React\EventLoop\LoopInterface;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
-use Drift\HttpKernel\AsyncEventDispatcher;
-use Drift\HttpKernel\AsyncHttpKernel;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
@@ -72,9 +72,9 @@ abstract class AsyncKernelFunctionalTest extends BaseFunctionalTest
                     'public' => true,
                     'factory' => [
                         Factory::class,
-                        'create'
-                    ]
-                ]
+                        'create',
+                    ],
+                ],
             ],
         ];
 
@@ -112,7 +112,7 @@ abstract class AsyncKernelFunctionalTest extends BaseFunctionalTest
             ],
             static::decorateConfiguration($configuration),
             static::decorateRoutes($routes),
-            'dev', static::debug()
+            static::environment(), static::debug()
         );
     }
 
@@ -141,12 +141,22 @@ abstract class AsyncKernelFunctionalTest extends BaseFunctionalTest
     }
 
     /**
-     * Kernel in debug mode
+     * Kernel in debug mode.
      *
      * @return bool
      */
     protected static function debug(): bool
     {
         return false;
+    }
+
+    /**
+     * Kernel in debug mode.
+     *
+     * @return string
+     */
+    protected static function environment(): string
+    {
+        return 'dev';
     }
 }

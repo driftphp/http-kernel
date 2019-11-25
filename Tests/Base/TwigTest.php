@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the Symfony Async Kernel
+ * This file is part of the Drift Http Kernel
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -13,17 +13,19 @@
 
 declare(strict_types=1);
 
-namespace Drift\HttpKernel\Tests;
+namespace Drift\HttpKernel\Tests\Base;
 
 use Clue\React\Block;
+use Drift\HttpKernel\Tests\AsyncKernelFunctionalTest;
+use Drift\HttpKernel\Tests\Listener;
 use React\EventLoop\StreamSelectLoop;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Class GetResponsesPromiseFunctionalTest.
+ * Class TwigTest.
  */
-class GetResponsesPromiseFunctionalTest extends AsyncKernelFunctionalTest
+class TwigTest extends AsyncKernelFunctionalTest
 {
     /**
      * Decorate configuration.
@@ -40,18 +42,8 @@ class GetResponsesPromiseFunctionalTest extends AsyncKernelFunctionalTest
             'tags' => [
                 [
                     'name' => 'kernel.event_listener',
-                    'event' => 'kernel.request',
-                    'method' => 'handleGetResponsePromiseB',
-                ],
-                [
-                    'name' => 'kernel.event_listener',
-                    'event' => 'kernel.request',
-                    'method' => 'handleGetResponsePromise1',
-                ],
-                [
-                    'name' => 'kernel.event_listener',
-                    'event' => 'kernel.request',
-                    'method' => 'handleGetResponsePromiseA',
+                    'event' => 'kernel.view',
+                    'method' => 'handleView',
                 ],
             ],
         ];
@@ -67,7 +59,7 @@ class GetResponsesPromiseFunctionalTest extends AsyncKernelFunctionalTest
         $loop = new StreamSelectLoop();
         $request = new Request([], [], [], [], [], [
             'REQUEST_METHOD' => 'GET',
-            'REQUEST_URI' => '/promise',
+            'REQUEST_URI' => '/simple-result',
             'SERVER_PORT' => 80,
         ]);
 
@@ -76,15 +68,12 @@ class GetResponsesPromiseFunctionalTest extends AsyncKernelFunctionalTest
             ->handleAsync($request)
             ->then(function (Response $response) {
                 $this->assertEquals(
-                    'B',
+                    json_encode(['a', 'b']),
                     $response->getContent()
                 );
-
-                $this->assertEmpty($_GET['partial']);
             });
 
         $loop->run();
         Block\await($promise, $loop);
-        $this->assertEmpty($_GET['partial']);
     }
 }
