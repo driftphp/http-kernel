@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the Symfony Async Kernel
+ * This file is part of the Drift Http Kernel
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -13,8 +13,9 @@
 
 declare(strict_types=1);
 
-namespace Drift\HttpKernel\Tests;
+namespace Drift\HttpKernel\Tests\Base;
 
+use Drift\HttpKernel\Tests\AsyncKernelFunctionalTest;
 use Exception;
 use Symfony\Component\HttpFoundation\Request;
 

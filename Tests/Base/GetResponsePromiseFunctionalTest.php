@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the Symfony Async Kernel
+ * This file is part of the Drift Http Kernel
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -13,17 +13,21 @@
 
 declare(strict_types=1);
 
-namespace Drift\HttpKernel\Tests;
+namespace Drift\HttpKernel\Tests\Base;
 
 use Clue\React\Block;
+use Drift\HttpKernel\Tests\AsyncKernelFunctionalTest;
+use Drift\HttpKernel\Tests\Listener;
+use Exception;
 use React\EventLoop\StreamSelectLoop;
+use React\Promise;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Class GetResponsesPromiseFunctionalNoPromiseTest.
+ * Class GetResponsePromiseFunctionalTest.
  */
-class GetResponsesPromiseFunctionalNoPromiseTest extends AsyncKernelFunctionalTest
+class GetResponsePromiseFunctionalTest extends AsyncKernelFunctionalTest
 {
     /**
      * Decorate configuration.
@@ -41,22 +45,12 @@ class GetResponsesPromiseFunctionalNoPromiseTest extends AsyncKernelFunctionalTe
                 [
                     'name' => 'kernel.event_listener',
                     'event' => 'kernel.request',
-                    'method' => 'handleGetResponsePromise1',
-                ],
-                [
-                    'name' => 'kernel.event_listener',
-                    'event' => 'kernel.request',
-                    'method' => 'handleGetResponsePromise2',
-                ],
-                [
-                    'name' => 'kernel.event_listener',
-                    'event' => 'kernel.request',
-                    'method' => 'handleGetResponsePromise3',
-                ],
-                [
-                    'name' => 'kernel.event_listener',
-                    'event' => 'kernel.request',
                     'method' => 'handleGetResponsePromiseA',
+                ],
+                [
+                    'name' => 'kernel.event_listener',
+                    'event' => 'kernel.exception',
+                    'method' => 'handleGetExceptionA',
                 ],
             ],
         ];
@@ -72,26 +66,44 @@ class GetResponsesPromiseFunctionalNoPromiseTest extends AsyncKernelFunctionalTe
     public function testSyncKernel()
     {
         $loop = new StreamSelectLoop();
-        $request = new Request([], [], [], [], [], [
-            'REQUEST_METHOD' => 'GET',
-            'REQUEST_URI' => '/promise',
-            'SERVER_PORT' => 80,
-        ]);
 
-        $_GET['partial'] = '';
-        $promise = self::$kernel
-            ->handleAsync($request)
+        $promise1 = self::$kernel
+            ->handleAsync(new Request([], [], [], [], [], [
+                'REQUEST_METHOD' => 'GET',
+                'REQUEST_URI' => '/promise',
+                'SERVER_PORT' => 80,
+            ]))
             ->then(function (Response $response) {
                 $this->assertEquals(
                     'A',
                     $response->getContent()
                 );
+            });
 
-                $this->assertEquals('123', $_GET['partial']);
+        $promise2 = self::$kernel
+            ->handleAsync(new Request([], [], [], [], [], [
+                'REQUEST_METHOD' => 'GET',
+                'REQUEST_URI' => '/promise-exception',
+                'SERVER_PORT' => 80,
+            ]))
+            ->then(null, function (Exception $exception) {
+                $this->assertEquals(
+                    'EXC',
+                    $exception->getMessage()
+                );
+
+                $this->assertEquals(
+                    404,
+                    $exception->getCode()
+                );
             });
 
         $loop->run();
-        Block\await($promise, $loop);
-        $this->assertEquals('123', $_GET['partial']);
+        Block\await(
+            Promise\all([
+                $promise1,
+                $promise2,
+            ]), $loop
+        );
     }
 }

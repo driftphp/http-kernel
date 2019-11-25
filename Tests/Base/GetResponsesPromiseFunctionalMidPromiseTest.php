@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the Symfony Async Kernel
+ * This file is part of the Drift Http Kernel
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -13,17 +13,19 @@
 
 declare(strict_types=1);
 
-namespace Drift\HttpKernel\Tests;
+namespace Drift\HttpKernel\Tests\Base;
 
 use Clue\React\Block;
+use Drift\HttpKernel\Tests\AsyncKernelFunctionalTest;
+use Drift\HttpKernel\Tests\Listener;
 use React\EventLoop\StreamSelectLoop;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Class TwigTest.
+ * Class GetResponsesPromiseFunctionalMidPromiseTest.
  */
-class TwigTest extends AsyncKernelFunctionalTest
+class GetResponsesPromiseFunctionalMidPromiseTest extends AsyncKernelFunctionalTest
 {
     /**
      * Decorate configuration.
@@ -40,8 +42,33 @@ class TwigTest extends AsyncKernelFunctionalTest
             'tags' => [
                 [
                     'name' => 'kernel.event_listener',
-                    'event' => 'kernel.view',
-                    'method' => 'handleView',
+                    'event' => 'kernel.request',
+                    'method' => 'handleGetResponsePromise1',
+                ],
+                [
+                    'name' => 'kernel.event_listener',
+                    'event' => 'kernel.request',
+                    'method' => 'handleGetResponsePromise2',
+                ],
+                [
+                    'name' => 'kernel.event_listener',
+                    'event' => 'kernel.request',
+                    'method' => 'handleGetResponsePromise1',
+                ],
+                [
+                    'name' => 'kernel.event_listener',
+                    'event' => 'kernel.request',
+                    'method' => 'handleGetResponsePromiseA',
+                ],
+                [
+                    'name' => 'kernel.event_listener',
+                    'event' => 'kernel.request',
+                    'method' => 'handleGetResponsePromise2',
+                ],
+                [
+                    'name' => 'kernel.event_listener',
+                    'event' => 'kernel.request',
+                    'method' => 'handleGetResponsePromise3',
                 ],
             ],
         ];
@@ -57,7 +84,7 @@ class TwigTest extends AsyncKernelFunctionalTest
         $loop = new StreamSelectLoop();
         $request = new Request([], [], [], [], [], [
             'REQUEST_METHOD' => 'GET',
-            'REQUEST_URI' => '/simple-result',
+            'REQUEST_URI' => '/promise',
             'SERVER_PORT' => 80,
         ]);
 
@@ -66,12 +93,15 @@ class TwigTest extends AsyncKernelFunctionalTest
             ->handleAsync($request)
             ->then(function (Response $response) {
                 $this->assertEquals(
-                    json_encode(['a', 'b']),
+                    'A',
                     $response->getContent()
                 );
+
+                $this->assertEquals('121', $_GET['partial']);
             });
 
         $loop->run();
         Block\await($promise, $loop);
+        $this->assertEquals('121', $_GET['partial']);
     }
 }
