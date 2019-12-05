@@ -21,9 +21,11 @@ use React\Filesystem\Filesystem;
 use React\Promise\PromiseInterface;
 use React\Promise\RejectedPromise;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Kernel;
 
@@ -32,6 +34,16 @@ use Symfony\Component\HttpKernel\Kernel;
  */
 abstract class AsyncKernel extends Kernel implements CompilerPassInterface
 {
+    /**
+     * Preload kernel.
+     */
+    public function preload(): PromiseInterface
+    {
+        return $this
+            ->getHttpKernel()
+            ->preload();
+    }
+
     /**
      * Handles a Request to convert it to a Response.
      *
@@ -51,7 +63,27 @@ abstract class AsyncKernel extends Kernel implements CompilerPassInterface
     }
 
     /**
+     * Build the kernel.
+     *
+     * @param ContainerBuilder $container
+     */
+    public function build(ContainerBuilder $container)
+    {
+        /*
+         * Register new kernel events
+         */
+        $container
+            ->addCompilerPass((new RegisterListenersPass())
+                ->setHotPathEvents([
+                    AsyncKernelEvents::PRELOAD,
+                ]), PassConfig::TYPE_BEFORE_REMOVING
+            );
+    }
+
+    /**
      * You can modify the container here before it is dumped to PHP code.
+     *
+     * @param ContainerBuilder $container
      */
     public function process(ContainerBuilder $container)
     {
