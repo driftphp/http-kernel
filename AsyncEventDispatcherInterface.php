@@ -17,7 +17,7 @@ namespace Drift\HttpKernel;
 
 use React\Promise\PromiseInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpKernel\Event\KernelEvent as Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Interface AsyncEventDispatcherInterface.

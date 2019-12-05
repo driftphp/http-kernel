@@ -13,15 +13,16 @@
         "php": "^7.2.9",
 
         "symfony/http-kernel": "^4.4 || ^5.0",
-        "symfony/dependency-injection": "^4.4 || ^5.0",
+        "symfony/dependency-injection": "^5.0",
+        "symfony/event-dispatcher-contracts": "^2.0",
         "react/promise": "^2.7",
         "react/filesystem": "^0.1"
     },
     "require-dev": {
         "mmoreram/symfony-bundle-dependencies": "^2.2.0",
-        "mmoreram/base-bundle": "^2.0.0",
-        "symfony/yaml": "^4.4 || ^5.0",
-        "symfony/console": "^4.4 || ^5.0",
+        "mmoreram/base-bundle": "^2.0.2",
+        "symfony/yaml": "^5.0",
+        "symfony/console": "^5.0",
         "clue/block-react": "^1.3"
     },
     "autoload": {

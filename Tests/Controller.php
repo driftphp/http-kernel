@@ -19,6 +19,7 @@ use Exception;
 use React\Promise\FulfilledPromise;
 use React\Promise\PromiseInterface;
 use React\Promise\RejectedPromise;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -74,5 +75,15 @@ class Controller
     public function getSimpleResult(): array
     {
         return ['a', 'b'];
+    }
+
+    /**
+     * Return array.
+     *
+     * @return JsonResponse
+     */
+    public function getGet(): JsonResponse
+    {
+        return new JsonResponse($_GET);
     }
 }

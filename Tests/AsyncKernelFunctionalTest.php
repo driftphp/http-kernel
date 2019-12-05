@@ -104,6 +104,11 @@ abstract class AsyncKernelFunctionalTest extends BaseFunctionalTest
                 Controller::class.':getSimpleResult',
                 'simple-result',
             ],
+            [
+                '/get',
+                Controller::class.':getGet',
+                'get',
+            ],
         ];
 
         return new DriftBaseKernel(

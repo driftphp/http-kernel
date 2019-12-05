@@ -15,11 +15,11 @@ declare(strict_types=1);
 
 namespace Drift\HttpKernel;
 
+use Drift\HttpKernel\Event\PreloadEvent;
 use Drift\HttpKernel\Exception\AsyncEventDispatcherNeededException;
 use Exception;
 use React\Promise\FulfilledPromise;
 use React\Promise\PromiseInterface;
-use React\Promise\RejectedPromise;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Exception\RequestExceptionInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -64,6 +64,8 @@ class AsyncHttpKernel extends HttpKernel
      * @param ControllerResolverInterface    $resolver
      * @param RequestStack|null              $requestStack
      * @param ArgumentResolverInterface|null $argumentResolver
+     *
+     * @throws AsyncEventDispatcherNeededException
      */
     public function __construct(
         EventDispatcherInterface $dispatcher,
@@ -71,6 +73,10 @@ class AsyncHttpKernel extends HttpKernel
         RequestStack $requestStack = null,
         ArgumentResolverInterface $argumentResolver = null
     ) {
+        if (!$dispatcher instanceof AsyncEventDispatcherInterface) {
+            throw new AsyncEventDispatcherNeededException(sprintf('The EventDispatcher instance is not a valid %s instance. %s passed.', AsyncEventDispatcherInterface::class, get_class($this->dispatcher)));
+        }
+
         $this->dispatcher = $dispatcher;
         $this->resolver = $resolver;
         $this->requestStack = $requestStack ?: new RequestStack();
@@ -89,6 +95,16 @@ class AsyncHttpKernel extends HttpKernel
     }
 
     /**
+     * Preload kernel.
+     */
+    public function preload(): PromiseInterface
+    {
+        return $this
+            ->dispatcher
+            ->asyncDispatch(AsyncKernelEvents::PRELOAD, new PreloadEvent());
+    }
+
+    /**
      * Handles a Request to convert it to a Response.
      *
      * @param Request $request
@@ -97,14 +113,6 @@ class AsyncHttpKernel extends HttpKernel
      */
     public function handleAsync(Request $request): PromiseInterface
     {
-        if (!$this->dispatcher instanceof AsyncEventDispatcherInterface) {
-            return new RejectedPromise(
-                new AsyncEventDispatcherNeededException(
-                    sprintf('The EventDispathcer instance is not a valid %s instance. %s passed.', AsyncEventDispatcherInterface::class, get_class($this->dispatcher))
-                )
-            );
-        }
-
         $request->headers->set('X-Php-Ob-Level', ob_get_level());
 
         return
