@@ -217,19 +217,23 @@ class AsyncHttpKernel extends HttpKernel
         return (new FulfilledPromise())
             ->then(function () use ($request, $response, $controller, $type) {
                 $event = new ViewEvent($this, $request, $type, $response);
-                $this->dispatcher->dispatch($event, KernelEvents::VIEW);
 
-                if ($event->hasResponse()) {
-                    return $event->getResponse();
-                } else {
-                    $msg = sprintf('The controller must return a "Symfony\Component\HttpFoundation\Response" object but it returned %s.', $this->varToString($response));
-                    // the user may have forgotten to return something
-                    if (null === $response) {
-                        $msg .= ' Did you forget to add a return statement somewhere in your controller?';
-                    }
+                return $this
+                    ->dispatcher
+                    ->asyncDispatch(KernelEvents::VIEW, $event)
+                    ->then(function(ViewEvent $event) use ($controller, $response) {
+                        if ($event->hasResponse()) {
+                            return $event->getResponse();
+                        } else {
+                            $msg = sprintf('The controller must return a "Symfony\Component\HttpFoundation\Response" object but it returned %s.', $this->varToString($response));
+                            // the user may have forgotten to return something
+                            if (null === $response) {
+                                $msg .= ' Did you forget to add a return statement somewhere in your controller?';
+                            }
 
-                    throw new ControllerDoesNotReturnResponseException($msg, $controller, __FILE__, __LINE__ - 17);
-                }
+                            throw new ControllerDoesNotReturnResponseException($msg, $controller, __FILE__, __LINE__ - 17);
+                        }
+                    });
             });
     }
 
