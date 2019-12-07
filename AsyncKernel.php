@@ -15,16 +15,15 @@ declare(strict_types=1);
 
 namespace Drift\HttpKernel;
 
+use Drift\HttpKernel\DependencyInjection\CompilerPass\EventDispatcherCompilerPass;
+use Drift\HttpKernel\DependencyInjection\CompilerPass\EventLoopCompilerPass;
+use Drift\HttpKernel\DependencyInjection\CompilerPass\FilesystemCompilerPass;
 use Drift\HttpKernel\Exception\AsyncHttpKernelNeededException;
-use React\EventLoop\LoopInterface;
-use React\Filesystem\Filesystem;
 use React\Promise\PromiseInterface;
 use React\Promise\RejectedPromise;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Kernel;
@@ -78,6 +77,10 @@ abstract class AsyncKernel extends Kernel implements CompilerPassInterface
                     AsyncKernelEvents::PRELOAD,
                 ]), PassConfig::TYPE_BEFORE_REMOVING
             );
+
+        $container->addCompilerPass(new EventLoopCompilerPass());
+        $container->addCompilerPass(new EventDispatcherCompilerPass($this->isDebug()));
+        $container->addCompilerPass(new FilesystemCompilerPass());
     }
 
     /**
@@ -87,77 +90,10 @@ abstract class AsyncKernel extends Kernel implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        if ($container->has('event_dispatcher')) {
-            $this->isDebug()
-                ? $this->processEventDispatcherDebug($container)
-                : $this->processEventDispatcher($container);
-        }
-
         if ($container->has('http_kernel')) {
             $container
                 ->getDefinition('http_kernel')
                 ->setClass(AsyncHttpKernel::class);
         }
-
-        if (!$container->has('reactphp.event_loop')) {
-            $loop = new Definition(LoopInterface::class);
-            $loop->setSynthetic(true);
-            $loop->setPublic(true);
-            $container->setDefinition('reactphp.event_loop', $loop);
-        }
-
-        if ($container->has('reactphp.event_loop')) {
-            $container->setAlias(LoopInterface::class, 'reactphp.event_loop');
-            $container->setAlias('event_loop', 'reactphp.event_loop');
-            $container->setAlias('drift.event_loop', 'reactphp.event_loop');
-        }
-
-        /*
-         * Create a filesystem instance
-         */
-        if (!$container->has('drift.filesystem')) {
-            $filesystem = new Definition(Filesystem::class, [
-                new Reference('drift.event_loop'),
-            ]);
-
-            $filesystem->setFactory([
-                Filesystem::class,
-                'create',
-            ]);
-
-            $filesystem->setPublic(true);
-            $container->setDefinition('drift.filesystem', $filesystem);
-            $container->setAlias(Filesystem::class, 'drift.filesystem');
-        }
-    }
-
-    /**
-     * Process event dispatcher.
-     */
-    private function processEventDispatcher(ContainerBuilder $container)
-    {
-        $container
-            ->getDefinition('event_dispatcher')
-            ->setClass(AsyncEventDispatcher::class);
-
-        $container->setAlias(AsyncEventDispatcherInterface::class, 'event_dispatcher');
-    }
-
-    /**
-     * Process event dispatcher in debug.
-     */
-    private function processEventDispatcherDebug(ContainerBuilder $container)
-    {
-        if (!$container->hasDefinition('debug.event_dispatcher')) {
-            $this->processEventDispatcher($container);
-
-            return;
-        }
-
-        $container
-            ->getDefinition('debug.event_dispatcher')
-            ->setClass(TraceableAsyncEventDispatcher::class);
-
-        $container->setAlias(AsyncEventDispatcherInterface::class, 'event_dispatcher');
     }
 }
