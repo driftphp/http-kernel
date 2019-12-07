@@ -135,7 +135,12 @@ class Listener
      */
     public function handleView(ViewEvent $event)
     {
-        $event->setResponse(new JsonResponse($event->getControllerResult()));
+        return (new FulfilledPromise($event))
+            ->then(function(ViewEvent $event) {
+
+                $event->setResponse(new JsonResponse($event->getControllerResult()));
+            });
+
     }
 
     /**
