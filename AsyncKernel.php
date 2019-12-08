@@ -22,9 +22,7 @@ use Drift\HttpKernel\Exception\AsyncHttpKernelNeededException;
 use React\Promise\PromiseInterface;
 use React\Promise\RejectedPromise;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Kernel;
 
@@ -68,16 +66,6 @@ abstract class AsyncKernel extends Kernel implements CompilerPassInterface
      */
     public function build(ContainerBuilder $container)
     {
-        /*
-         * Register new kernel events
-         */
-        $container
-            ->addCompilerPass((new RegisterListenersPass())
-                ->setHotPathEvents([
-                    AsyncKernelEvents::PRELOAD,
-                ]), PassConfig::TYPE_BEFORE_REMOVING
-            );
-
         $container->addCompilerPass(new EventLoopCompilerPass());
         $container->addCompilerPass(new EventDispatcherCompilerPass($this->isDebug()));
         $container->addCompilerPass(new FilesystemCompilerPass());
