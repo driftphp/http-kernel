@@ -1,4 +1,4 @@
-# Symfony Async Kernel
+# DriftPHP Http Kernel
 
 [![CircleCI](https://circleci.com/gh/driftphp/http-kernel.svg?style=svg)](https://circleci.com/gh/driftphp/http-kernel)
 
