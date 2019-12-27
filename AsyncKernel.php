@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace Drift\HttpKernel;
 
+use Drift\HttpKernel\DependencyInjection\CompilerPass\AsyncServicesCompilerPass;
 use Drift\HttpKernel\DependencyInjection\CompilerPass\EventDispatcherCompilerPass;
 use Drift\HttpKernel\DependencyInjection\CompilerPass\EventLoopCompilerPass;
 use Drift\HttpKernel\DependencyInjection\CompilerPass\FilesystemCompilerPass;
@@ -69,6 +70,7 @@ abstract class AsyncKernel extends Kernel implements CompilerPassInterface
         $container->addCompilerPass(new EventLoopCompilerPass());
         $container->addCompilerPass(new EventDispatcherCompilerPass($this->isDebug()));
         $container->addCompilerPass(new FilesystemCompilerPass());
+        $container->addCompilerPass(new AsyncServicesCompilerPass());
     }
 
     /**
