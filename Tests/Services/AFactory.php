@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the Drift Http Kernel
+ * This file is part of the DriftPHP Project
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -40,24 +40,24 @@ final class AFactory
     }
 
     /**
-     * Create a class
+     * Create a class.
      */
-    public static function createAFulfilledClass() : PromiseInterface
+    public static function createAFulfilledClass(): PromiseInterface
     {
         return (new FulfilledPromise())
-            ->then(function() {
+            ->then(function () {
                 return new AClass();
             });
     }
 
     /**
-     * Create a class
+     * Create a class.
      */
-    public static function createARejectedClass() : PromiseInterface
+    public static function createARejectedClass(): PromiseInterface
     {
         return (new FulfilledPromise())
-            ->then(function() {
-                throw new \Exception;
+            ->then(function () {
+                throw new \Exception();
             });
     }
 }

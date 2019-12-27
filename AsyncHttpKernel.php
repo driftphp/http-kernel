@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the Drift Http Kernel
+ * This file is part of the DriftPHP Project
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -221,7 +221,7 @@ class AsyncHttpKernel extends HttpKernel
                 return $this
                     ->dispatcher
                     ->asyncDispatch(KernelEvents::VIEW, $event)
-                    ->then(function(ViewEvent $event) use ($controller, $response) {
+                    ->then(function (ViewEvent $event) use ($controller, $response) {
                         if ($event->hasResponse()) {
                             return $event->getResponse();
                         } else {

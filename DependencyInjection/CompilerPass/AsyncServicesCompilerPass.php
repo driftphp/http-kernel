@@ -1,7 +1,7 @@
 <?php
 
 /*
- * This file is part of the Drift Http Kernel
+ * This file is part of the DriftPHP Project
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -23,7 +23,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Class AsyncServicesCompilerPass
+ * Class AsyncServicesCompilerPass.
  */
 class AsyncServicesCompilerPass implements CompilerPassInterface
 {
@@ -38,17 +38,17 @@ class AsyncServicesCompilerPass implements CompilerPassInterface
 
         foreach ($servicesId as $serviceId => $_) {
             $promiseDefinition = $container->getDefinition($serviceId);
-            $container->setDefinition($serviceId . '.promise', $promiseDefinition);
+            $container->setDefinition($serviceId.'.promise', $promiseDefinition);
 
             $decorator = new Definition($promiseDefinition->getClass(), [
                 new Reference(LoopInterface::class),
-                new Reference($serviceId . '.promise')
+                new Reference($serviceId.'.promise'),
             ]);
 
             $decorator->setPublic($promiseDefinition->isPublic());
             $decorator->setFactory([
                 AsyncServiceAwaiter::class,
-                'await'
+                'await',
             ]);
 
             $container->setDefinition($serviceId, $decorator);
