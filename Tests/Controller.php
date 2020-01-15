@@ -19,6 +19,7 @@ use Exception;
 use React\Promise\FulfilledPromise;
 use React\Promise\PromiseInterface;
 use React\Promise\RejectedPromise;
+use RingCentral\Psr7\Response as Psr7Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -78,12 +79,22 @@ class Controller
     }
 
     /**
-     * Return array.
+     * Return json response.
      *
      * @return JsonResponse
      */
     public function getGet(): JsonResponse
     {
         return new JsonResponse($_GET);
+    }
+
+    /**
+     * Return react response.
+     *
+     * @return Psr7Response
+     */
+    public function getPSR7Response(): Psr7Response
+    {
+        return new Psr7Response(200, [], 'psr7');
     }
 }

@@ -16,6 +16,7 @@
         "symfony/dependency-injection": "^5.0",
         "symfony/event-dispatcher-contracts": "^2.0",
         "react/promise": "^2.7",
+        "react/http": "^0.8",
         "react/filesystem": "^0.1",
         "clue/block-react": "^1.3"
     },

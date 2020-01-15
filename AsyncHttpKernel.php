@@ -20,6 +20,7 @@ use Drift\HttpKernel\Exception\AsyncEventDispatcherNeededException;
 use Exception;
 use React\Promise\FulfilledPromise;
 use React\Promise\PromiseInterface;
+use RingCentral\Psr7\Response as Psr7Response;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Exception\RequestExceptionInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -32,7 +33,6 @@ use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
@@ -187,14 +187,19 @@ class AsyncHttpKernel extends HttpKernel
                 return $controller(...$arguments);
             })
             ->then(function ($response) use ($request, $type, $controller) {
-                if (!$response instanceof Response) {
+                if (
+                    !$response instanceof Response &&
+                    !$response instanceof Psr7Response
+                ) {
                     return $this->callAsyncView($request, $response, $controller, $type);
                 }
 
                 return $response;
             })
             ->then(function ($response) use ($request, $type) {
-                return $this->filterResponsePromise($response, $request, $type);
+                return ($response instanceof Psr7Response)
+                    ? new FulfilledPromise($response)
+                    : $this->filterResponsePromise($response, $request, $type);
             });
     }
 
