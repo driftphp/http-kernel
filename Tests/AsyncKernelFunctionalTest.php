@@ -109,6 +109,11 @@ abstract class AsyncKernelFunctionalTest extends BaseFunctionalTest
                 Controller::class.':getGet',
                 'get',
             ],
+            [
+                '/psr7',
+                Controller::class.':getPSR7Response',
+                'psr7',
+            ],
         ];
 
         return new DriftBaseKernel(
