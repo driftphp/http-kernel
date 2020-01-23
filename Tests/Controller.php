@@ -15,12 +15,15 @@ declare(strict_types=1);
 
 namespace Drift\HttpKernel\Tests;
 
+use Drift\HttpKernel\Context;
+use Drift\HttpKernel\RequestWithContext;
 use Exception;
 use React\Promise\FulfilledPromise;
 use React\Promise\PromiseInterface;
 use React\Promise\RejectedPromise;
 use RingCentral\Psr7\Response as Psr7Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -96,5 +99,20 @@ class Controller
     public function getPSR7Response(): Psr7Response
     {
         return new Psr7Response(200, [], 'psr7');
+    }
+
+    /**
+     * Return context response.
+     *
+     * @param RequestWithContext $request
+     *
+     * @return JsonResponse
+     */
+    public function getContext(RequestWithContext $request): JsonResponse
+    {
+        $context = $request->getContext();
+        $request->getContext()->set(uniqid(), 'x');
+
+        return new JsonResponse($context->all());
     }
 }
