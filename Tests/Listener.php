@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace Drift\HttpKernel\Tests;
 
 use Drift\HttpKernel\Event\PreloadEvent;
+use Drift\HttpKernel\Tests\Event\Event1;
 use React\Promise\FulfilledPromise;
 use React\Promise\PromiseInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -149,5 +150,15 @@ class Listener
     public function handlePreload(PreloadEvent $event)
     {
         $_GET['preloaded'] = true;
+    }
+
+    /**
+     * Handle event1.
+     *
+     * @param Event1 $event1
+     */
+    public function handleEvent1(Event1 $event1)
+    {
+        $_GET['event1'] = true;
     }
 }
