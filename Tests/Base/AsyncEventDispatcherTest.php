@@ -19,6 +19,7 @@ use Clue\React\Block;
 use Drift\HttpKernel\AsyncEventDispatcherInterface;
 use Drift\HttpKernel\Tests\AsyncKernelFunctionalTest;
 use Drift\HttpKernel\Tests\Event\Event1;
+use Drift\HttpKernel\Tests\Event\Event2;
 use Drift\HttpKernel\Tests\Listener;
 use React\EventLoop\Factory;
 
@@ -49,6 +50,11 @@ class AsyncEventDispatcherTest extends AsyncKernelFunctionalTest
                     'event' => Event1::class,
                     'method' => 'handleEvent1',
                 ],
+                [
+                    'name' => 'kernel.event_listener',
+                    'event' => Event2::class,
+                    'method' => 'handleEvent2',
+                ],
             ],
         ];
 
@@ -67,6 +73,24 @@ class AsyncEventDispatcherTest extends AsyncKernelFunctionalTest
             ->asyncDispatch(new Event1())
             ->then(function (Event1 $_) {
                 $this->assertTrue($_GET['event1']);
+            });
+
+        $loop->run();
+        Block\await($promise, $loop);
+    }
+
+    /**
+     * Test async event dispatcher.
+     */
+    public function testAsyncDispatchWithEnvelope()
+    {
+        $loop = Factory::create();
+
+        $_GET['event2'] = false;
+        $promise = self::get('dispatcher_test')
+            ->asyncDispatch(new Event2())
+            ->then(function (Event2 $_) {
+                $this->assertTrue($_GET['event2']);
             });
 
         $loop->run();

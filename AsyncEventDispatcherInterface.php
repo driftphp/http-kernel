@@ -17,7 +17,6 @@ namespace Drift\HttpKernel;
 
 use React\Promise\PromiseInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Interface AsyncEventDispatcherInterface.
@@ -27,13 +26,13 @@ interface AsyncEventDispatcherInterface extends EventDispatcherInterface
     /**
      * Dispatch an event asynchronously.
      *
-     * @param Event  $event
+     * @param object $event
      * @param string $eventName
      *
      * @return PromiseInterface
      */
     public function asyncDispatch(
-        Event $event,
-        string $eventName
+        $event,
+        string $eventName = null
     );
 }

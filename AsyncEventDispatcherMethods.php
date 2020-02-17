@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace Drift\HttpKernel;
 
+use Drift\HttpKernel\Event\DomainEventEnvelope;
 use React\Promise\FulfilledPromise;
 use React\Promise\PromiseInterface;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -27,19 +28,26 @@ trait AsyncEventDispatcherMethods
     /**
      * Dispatch an event asynchronously.
      *
-     * @param Event  $event
+     * @param object $event
      * @param string $eventName
      *
      * @return PromiseInterface
      */
     public function asyncDispatch(
-        Event $event,
+        $event,
         string $eventName = null
     ) {
         $eventName = $eventName ?? \get_class($event);
+        $dispatchableEvent = $event instanceof Event
+            ? $event
+            : new DomainEventEnvelope($event);
 
         if ($listeners = $this->getListeners($eventName)) {
-            return $this->doAsyncDispatch($listeners, $eventName, $event);
+            return $this
+                ->doAsyncDispatch($listeners, $eventName, $dispatchableEvent)
+                ->then(function () use ($event) {
+                    return $event;
+                });
         }
 
         return new FulfilledPromise($event);
@@ -75,8 +83,6 @@ trait AsyncEventDispatcherMethods
             });
         }
 
-        return $promise->then(function () use ($event) {
-            return $event;
-        });
+        return $promise;
     }
 }
