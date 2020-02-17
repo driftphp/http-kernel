@@ -21,7 +21,6 @@ use Exception;
 use React\Promise\FulfilledPromise;
 use React\Promise\PromiseInterface;
 use RingCentral\Psr7\Response as Psr7Response;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Exception\RequestExceptionInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -42,6 +41,7 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Throwable;
 
 /**
@@ -101,7 +101,7 @@ class AsyncHttpKernel extends HttpKernel
     {
         return $this
             ->dispatcher
-            ->asyncDispatch(AsyncKernelEvents::PRELOAD, new PreloadEvent());
+            ->asyncDispatch(new PreloadEvent(), AsyncKernelEvents::PRELOAD);
     }
 
     /**
@@ -144,7 +144,7 @@ class AsyncHttpKernel extends HttpKernel
         $event = new RequestEvent($this, $request, $type);
 
         return $dispatcher
-            ->asyncDispatch(KernelEvents::REQUEST, $event)
+            ->asyncDispatch($event, KernelEvents::REQUEST)
             ->then(function (RequestEvent $event) use ($request, $type) {
                 return $event->hasResponse()
                     ? $this->filterResponsePromise(
@@ -225,7 +225,7 @@ class AsyncHttpKernel extends HttpKernel
 
                 return $this
                     ->dispatcher
-                    ->asyncDispatch(KernelEvents::VIEW, $event)
+                    ->asyncDispatch($event, KernelEvents::VIEW)
                     ->then(function (ViewEvent $event) use ($controller, $response) {
                         if ($event->hasResponse()) {
                             return $event->getResponse();
@@ -259,7 +259,7 @@ class AsyncHttpKernel extends HttpKernel
 
         return $this
             ->dispatcher
-            ->asyncDispatch(KernelEvents::RESPONSE, $event)
+            ->asyncDispatch($event, KernelEvents::RESPONSE)
             ->then(function (ResponseEvent $event) use ($request, $type) {
                 $this->finishRequestPromise($request, $type);
 
@@ -310,7 +310,7 @@ class AsyncHttpKernel extends HttpKernel
 
         return $this
             ->dispatcher
-            ->asyncDispatch(KernelEvents::EXCEPTION, $event)
+            ->asyncDispatch($event, KernelEvents::EXCEPTION)
             ->then(function (ExceptionEvent $event) use ($request, $type) {
                 // Supporting both 4.3 and 5.0
                 $throwable = ($event instanceof GetResponseForExceptionEvent)

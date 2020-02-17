@@ -51,7 +51,8 @@ class EventDispatcherCompilerPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         if ($container->has('event_dispatcher')) {
-            $this->isDebug
+            $this->isDebug &&
+            $container->hasDefinition('debug.event_dispatcher')
                 ? $this->processEventDispatcherDebug($container)
                 : $this->processEventDispatcher($container);
         }
@@ -78,16 +79,10 @@ class EventDispatcherCompilerPass implements CompilerPassInterface
      */
     private function processEventDispatcherDebug(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('debug.event_dispatcher')) {
-            $this->processEventDispatcher($container);
-
-            return;
-        }
-
         $container
             ->getDefinition('debug.event_dispatcher')
             ->setClass(TraceableAsyncEventDispatcher::class);
 
-        $container->setAlias(AsyncEventDispatcherInterface::class, 'event_dispatcher');
+        $container->setAlias(AsyncEventDispatcherInterface::class, 'debug.event_dispatcher');
     }
 }

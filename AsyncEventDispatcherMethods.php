@@ -27,15 +27,17 @@ trait AsyncEventDispatcherMethods
     /**
      * Dispatch an event asynchronously.
      *
-     * @param string $eventName
      * @param Event  $event
+     * @param string $eventName
      *
      * @return PromiseInterface
      */
     public function asyncDispatch(
-        string $eventName,
-        Event $event
+        Event $event,
+        string $eventName = null
     ) {
+        $eventName = $eventName ?? \get_class($event);
+
         if ($listeners = $this->getListeners($eventName)) {
             return $this->doAsyncDispatch($listeners, $eventName, $event);
         }
@@ -55,7 +57,7 @@ trait AsyncEventDispatcherMethods
      *
      * @return PromiseInterface
      */
-    public function doAsyncDispatch(
+    private function doAsyncDispatch(
         array $listeners,
         string $eventName,
         Event $event
