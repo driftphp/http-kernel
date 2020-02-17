@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace Drift\HttpKernel\Tests;
 
+use Drift\HttpKernel\Event\DomainEventEnvelope;
 use Drift\HttpKernel\Event\PreloadEvent;
 use Drift\HttpKernel\Tests\Event\Event1;
 use React\Promise\FulfilledPromise;
@@ -160,5 +161,15 @@ class Listener
     public function handleEvent1(Event1 $event1)
     {
         $_GET['event1'] = true;
+    }
+
+    /**
+     * Handle event2.
+     *
+     * @param DomainEventEnvelope $event2
+     */
+    public function handleEvent2(DomainEventEnvelope $event2)
+    {
+        $_GET['event2'] = true;
     }
 }
