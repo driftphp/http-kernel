@@ -16,9 +16,9 @@ declare(strict_types=1);
 namespace Drift\HttpKernel\Tests;
 
 use Exception;
-use React\Promise\FulfilledPromise;
+use function React\Promise\reject;
+use function React\Promise\resolve;
 use React\Promise\PromiseInterface;
-use React\Promise\RejectedPromise;
 use RingCentral\Psr7\Response as Psr7Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -45,7 +45,7 @@ class Controller
      */
     public function getPromise(): PromiseInterface
     {
-        return new FulfilledPromise(new Response('Y'));
+        return resolve(new Response('Y'));
     }
 
     /**
@@ -65,7 +65,7 @@ class Controller
      */
     public function getPromiseException(): PromiseInterface
     {
-        return new RejectedPromise(new Exception('E2'));
+        return reject(new Exception('E2'));
     }
 
     /**

@@ -18,7 +18,7 @@ namespace Drift\HttpKernel\Tests;
 use Drift\HttpKernel\Event\DomainEventEnvelope;
 use Drift\HttpKernel\Event\PreloadEvent;
 use Drift\HttpKernel\Tests\Event\Event1;
-use React\Promise\FulfilledPromise;
+use function React\Promise\resolve;
 use React\Promise\PromiseInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -40,7 +40,7 @@ class Listener
      */
     public function handleGetResponsePromiseA(RequestEvent $event)
     {
-        return (new FulfilledPromise())
+        return (resolve())
             ->then(function () use ($event) {
                 $event->setResponse(new Response('A'));
             });
@@ -55,7 +55,7 @@ class Listener
      */
     public function handleGetResponsePromiseB(RequestEvent $event)
     {
-        return (new FulfilledPromise())
+        return (resolve())
             ->then(function () use ($event) {
                 $event->setResponse(new Response('B'));
             });
@@ -88,7 +88,7 @@ class Listener
      */
     public function handleGetExceptionA(ExceptionEvent $event)
     {
-        return (new FulfilledPromise())
+        return (resolve())
             ->then(function () use ($event) {
                 $event->setResponse(new Response('EXC', 404));
             });
@@ -104,7 +104,7 @@ class Listener
     public function handleGetResponsePromise1(RequestEvent $event): PromiseInterface
     {
         return
-            (new FulfilledPromise())
+            (resolve())
                 ->then(function () {
                     $_GET['partial'] .= '1';
                 });
@@ -137,7 +137,7 @@ class Listener
      */
     public function handleView(ViewEvent $event)
     {
-        return (new FulfilledPromise($event))
+        return (resolve($event))
             ->then(function (ViewEvent $event) {
                 $event->setResponse(new JsonResponse($event->getControllerResult()));
             });

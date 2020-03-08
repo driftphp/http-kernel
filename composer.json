@@ -12,7 +12,7 @@
     "require": {
         "php": "^7.3",
 
-        "symfony/http-kernel": "^4.4 || ^5.0",
+        "symfony/http-kernel": "^5.0",
         "symfony/dependency-injection": "^5.0",
         "symfony/event-dispatcher-contracts": "^2.0",
         "react/promise": "^2.7",

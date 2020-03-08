@@ -18,7 +18,7 @@ namespace Drift\HttpKernel;
 use Drift\HttpKernel\Event\PreloadEvent;
 use Drift\HttpKernel\Exception\AsyncEventDispatcherNeededException;
 use Exception;
-use React\Promise\FulfilledPromise;
+use function React\Promise\resolve;
 use React\Promise\PromiseInterface;
 use RingCentral\Psr7\Response as Psr7Response;
 use Symfony\Component\HttpFoundation\Exception\RequestExceptionInterface;
@@ -182,10 +182,8 @@ class AsyncHttpKernel extends HttpKernel
         $controller = $event->getController();
         $arguments = $event->getArguments();
 
-        return (new FulfilledPromise())
-            ->then(function () use ($controller, $arguments) {
-                return $controller(...$arguments);
-            })
+        return
+            (resolve($controller(...$arguments)))
             ->then(function ($response) use ($request, $type, $controller) {
                 if (
                     !$response instanceof Response &&
@@ -198,7 +196,7 @@ class AsyncHttpKernel extends HttpKernel
             })
             ->then(function ($response) use ($request, $type) {
                 return ($response instanceof Psr7Response)
-                    ? new FulfilledPromise($response)
+                    ? resolve($response)
                     : $this->filterResponsePromise($response, $request, $type);
             });
     }
@@ -219,7 +217,8 @@ class AsyncHttpKernel extends HttpKernel
         callable $controller,
         int $type
     ): PromiseInterface {
-        return (new FulfilledPromise())
+        return
+            (resolve())
             ->then(function () use ($request, $response, $controller, $type) {
                 $event = new ViewEvent($this, $request, $type, $response);
 
@@ -313,9 +312,7 @@ class AsyncHttpKernel extends HttpKernel
             ->asyncDispatch($event, KernelEvents::EXCEPTION)
             ->then(function (ExceptionEvent $event) use ($request, $type) {
                 // Supporting both 4.3 and 5.0
-                $throwable = ($event instanceof GetResponseForExceptionEvent)
-                    ? $event->getException()
-                    : $event->getThrowable();
+                $throwable = $event->getThrowable();
 
                 if (!$event->hasResponse()) {
                     $this->finishRequestPromise($request, $type);
