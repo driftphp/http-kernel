@@ -15,8 +15,8 @@ declare(strict_types=1);
 
 namespace Drift\HttpKernel\Tests\Services;
 
+use function React\Promise\resolve;
 use React\EventLoop\LoopInterface;
-use React\Promise\FulfilledPromise;
 use React\Promise\PromiseInterface;
 
 /**
@@ -44,7 +44,7 @@ final class AFactory
      */
     public static function createAFulfilledClass(): PromiseInterface
     {
-        return (new FulfilledPromise())
+        return (resolve())
             ->then(function () {
                 return new AClass();
             });
@@ -55,7 +55,7 @@ final class AFactory
      */
     public static function createARejectedClass(): PromiseInterface
     {
-        return (new FulfilledPromise())
+        return (resolve())
             ->then(function () {
                 throw new \Exception();
             });

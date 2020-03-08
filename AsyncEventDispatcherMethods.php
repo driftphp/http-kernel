@@ -16,7 +16,7 @@ declare(strict_types=1);
 namespace Drift\HttpKernel;
 
 use Drift\HttpKernel\Event\DomainEventEnvelope;
-use React\Promise\FulfilledPromise;
+use function React\Promise\resolve;
 use React\Promise\PromiseInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
@@ -50,7 +50,7 @@ trait AsyncEventDispatcherMethods
                 });
         }
 
-        return new FulfilledPromise($event);
+        return resolve($event);
     }
 
     /**
@@ -70,16 +70,14 @@ trait AsyncEventDispatcherMethods
         string $eventName,
         Event $event
     ) {
-        $promise = new FulfilledPromise();
+        $promise = resolve();
         foreach ($listeners as $listener) {
             $promise = $promise->then(function () use ($event, $eventName, $listener) {
                 return
-                    (new FulfilledPromise())
-                        ->then(function () use ($event, $eventName, $listener) {
-                            return $event->isPropagationStopped()
-                                ? new FulfilledPromise()
-                                : $listener($event, $eventName, $this);
-                        });
+                    resolve($event->isPropagationStopped()
+                        ? null
+                        : $listener($event, $eventName, $this)
+                    );
             });
         }
 

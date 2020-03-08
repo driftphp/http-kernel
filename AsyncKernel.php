@@ -20,8 +20,8 @@ use Drift\HttpKernel\DependencyInjection\CompilerPass\EventDispatcherCompilerPas
 use Drift\HttpKernel\DependencyInjection\CompilerPass\EventLoopCompilerPass;
 use Drift\HttpKernel\DependencyInjection\CompilerPass\FilesystemCompilerPass;
 use Drift\HttpKernel\Exception\AsyncHttpKernelNeededException;
+use function React\Promise\reject;
 use React\Promise\PromiseInterface;
-use React\Promise\RejectedPromise;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\Request;
@@ -52,7 +52,7 @@ abstract class AsyncKernel extends Kernel implements CompilerPassInterface
     {
         $httpKernel = $this->getHttpKernel();
         if (!$httpKernel instanceof AsyncHttpKernel) {
-            return new RejectedPromise(
+            reject(
                 new AsyncHttpKernelNeededException('In order to use this AsyncKernel, you need to have the HttpAsyncKernel installed')
             );
         }

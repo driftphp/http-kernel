@@ -14,21 +14,14 @@ jobs:
             composer require phpunit/phpunit:7.5.17 --no-update
 
       - run:
-          name: Run tests / Symfony 4^4
+          name: Run tests / Lowest
           command: |
             composer update -n --prefer-dist --prefer-lowest --no-suggest
             rm -Rf var/*
             php vendor/bin/phpunit --testsuite=base
 
       - run:
-          name: Run tests / Symfony 5^0
-          command: |
-            composer update -n --prefer-dist --no-suggest
-            rm -Rf var/*
-            php vendor/bin/phpunit --testsuite=base
-
-      - run:
-          name: Run tests / No Stopwatch
+          name: Run tests / Highest + No Stopwatch
           command: |
             composer require symfony/stopwatch:^5.0
             composer update -n --prefer-dist --no-suggest
@@ -50,7 +43,7 @@ jobs:
             composer require phpunit/phpunit:7.5.17 --no-update
 
       - run:
-          name: Run tests / Symfony 5^0
+          name: Run tests / Highest
           command: |
             composer update -n --prefer-dist --no-suggest
             rm -Rf var/*
