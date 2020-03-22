@@ -20,6 +20,7 @@ use Drift\HttpKernel\DependencyInjection\CompilerPass\EventDispatcherCompilerPas
 use Drift\HttpKernel\DependencyInjection\CompilerPass\EventLoopCompilerPass;
 use Drift\HttpKernel\DependencyInjection\CompilerPass\FilesystemCompilerPass;
 use Drift\HttpKernel\Exception\AsyncHttpKernelNeededException;
+use Exception;
 use function React\Promise\reject;
 use React\Promise\PromiseInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -32,6 +33,23 @@ use Symfony\Component\HttpKernel\Kernel;
  */
 abstract class AsyncKernel extends Kernel implements CompilerPassInterface
 {
+    /**
+     * @var string
+     */
+    private $uid;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function boot()
+    {
+        if (!$this->booted) {
+            $this->uid = $this->generateUID();
+        }
+
+        parent::boot();
+    }
+
     /**
      * Preload kernel.
      */
@@ -85,5 +103,35 @@ abstract class AsyncKernel extends Kernel implements CompilerPassInterface
                 ->getDefinition('http_kernel')
                 ->setClass(AsyncHttpKernel::class);
         }
+    }
+
+    /**
+     * Get uid.
+     *
+     * @return string
+     */
+    public function getUID(): string
+    {
+        if (!$this->booted) {
+            throw new Exception('You cannot check the UID of a non-booted-yet kernel');
+        }
+
+        return $this->uid;
+    }
+
+    /**
+     * @return string
+     */
+    private function generateUID()
+    {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charactersLength = strlen($characters);
+        $randomString = '';
+
+        for ($i = 0; $i < 7; ++$i) {
+            $randomString .= $characters[rand(0, $charactersLength - 1)];
+        }
+
+        return $randomString;
     }
 }
