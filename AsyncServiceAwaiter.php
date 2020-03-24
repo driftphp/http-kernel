@@ -36,11 +36,8 @@ class AsyncServiceAwaiter
         LoopInterface $loop,
         $service
     ) {
-        if ($service instanceof PromiseInterface) {
-            $service = await($service, $loop);
-            $loop->run();
-        }
-
-        return $service;
+        return ($service instanceof PromiseInterface)
+            ? await($service, $loop)
+            : $service;
     }
 }
