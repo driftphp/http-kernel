@@ -31,7 +31,6 @@ use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
-use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
@@ -245,7 +244,7 @@ class AsyncHttpKernel extends HttpKernel
      * @param Request  $request
      * @param int      $type
      *
-     * @return PromiseInterface
+     * @return PromiseInterface<Response>
      *
      * @throws \RuntimeException if the passed object is not a Response instance
      */
@@ -256,28 +255,14 @@ class AsyncHttpKernel extends HttpKernel
         return $this
             ->dispatcher
             ->asyncDispatch($event, KernelEvents::RESPONSE)
-            ->then(function (ResponseEvent $event) use ($request, $type) {
-                $this->finishRequestPromise($request, $type);
-
-                return $event->getResponse();
+            ->then(function() use ($response) {
+                return $response;
             });
     }
 
     /**
      * COPY / PASTE methods.
      */
-
-    /**
-     * Publishes the finish request event, then pop the request from the stack.
-     *
-     * Note that the order of the operations is important here, otherwise
-     * operations such as {@link RequestStack::getParentRequest()} can lead to
-     * weird results.
-     */
-    private function finishRequestPromise(Request $request, int $type)
-    {
-        $this->dispatcher->dispatch(new FinishRequestEvent($this, $request, $type));
-    }
 
     /**
      * Handles an exception by trying to convert it to a Response.
@@ -311,8 +296,6 @@ class AsyncHttpKernel extends HttpKernel
                 $throwable = $event->getThrowable();
 
                 if (!$event->hasResponse()) {
-                    $this->finishRequestPromise($request, $type);
-
                     throw $throwable;
                 } else {
                     $response = $event->getResponse();
@@ -331,6 +314,7 @@ class AsyncHttpKernel extends HttpKernel
                 }
             })
             ->then(function (Response $response) use ($request, $type) {
+
                 return $this->filterResponsePromise($response, $request, $type);
             });
     }
