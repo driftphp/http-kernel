@@ -54,7 +54,6 @@ class AsyncHttpKernel extends HttpKernel
      */
     protected $dispatcher;
     protected $resolver;
-    protected $requestStack;
     private $argumentResolver;
 
     /**
@@ -79,7 +78,6 @@ class AsyncHttpKernel extends HttpKernel
 
         $this->dispatcher = $dispatcher;
         $this->resolver = $resolver;
-        $this->requestStack = $requestStack ?: new RequestStack();
         $this->argumentResolver = $argumentResolver;
 
         if (null === $this->argumentResolver) {
@@ -89,7 +87,7 @@ class AsyncHttpKernel extends HttpKernel
         parent::__construct(
             $dispatcher,
             $resolver,
-            $requestStack,
+            $requestStack ?: new RequestStack(),
             $argumentResolver
         );
     }
@@ -140,7 +138,6 @@ class AsyncHttpKernel extends HttpKernel
         $dispatcher = $this->dispatcher;
         $type = self::MASTER_REQUEST;
 
-        $this->requestStack->push($request);
         $event = new RequestEvent($this, $request, $type);
 
         return $dispatcher
@@ -280,7 +277,6 @@ class AsyncHttpKernel extends HttpKernel
     private function finishRequestPromise(Request $request, int $type)
     {
         $this->dispatcher->dispatch(new FinishRequestEvent($this, $request, $type));
-        $this->requestStack->pop();
     }
 
     /**
