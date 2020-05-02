@@ -49,6 +49,11 @@ class GetResponsePromiseFunctionalTest extends AsyncKernelFunctionalTest
                 ],
                 [
                     'name' => 'kernel.event_listener',
+                    'event' => 'kernel.response',
+                    'method' => 'handleResponseEvent',
+                ],
+                [
+                    'name' => 'kernel.event_listener',
                     'event' => 'kernel.exception',
                     'method' => 'handleGetExceptionA',
                 ],
@@ -98,11 +103,27 @@ class GetResponsePromiseFunctionalTest extends AsyncKernelFunctionalTest
                 );
             });
 
+        $promise3 = self::$kernel
+            ->handleAsync(new Request([
+                'replace_response' => '1',
+            ], [], [], [], [], [
+                'REQUEST_METHOD' => 'GET',
+                'REQUEST_URI' => '/promise',
+                'SERVER_PORT' => 80,
+            ]))
+            ->then(function (Response $response) {
+                $this->assertEquals(
+                    'response_replaced',
+                    $response->getContent()
+                );
+            });
+
         $loop->run();
         Block\await(
             Promise\all([
                 $promise1,
                 $promise2,
+                $promise3,
             ]), $loop
         );
     }

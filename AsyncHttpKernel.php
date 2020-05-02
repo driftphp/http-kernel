@@ -255,8 +255,8 @@ class AsyncHttpKernel extends HttpKernel
         return $this
             ->dispatcher
             ->asyncDispatch($event, KernelEvents::RESPONSE)
-            ->then(function() use ($response) {
-                return $response;
+            ->then(function (ResponseEvent $event) {
+                return $event->getResponse();
             });
     }
 
@@ -314,7 +314,6 @@ class AsyncHttpKernel extends HttpKernel
                 }
             })
             ->then(function (Response $response) use ($request, $type) {
-
                 return $this->filterResponsePromise($response, $request, $type);
             });
     }
