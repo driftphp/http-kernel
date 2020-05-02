@@ -9,11 +9,6 @@ jobs:
       - checkout
 
       - run:
-          name: Install PHPUnit
-          command: |
-            composer require phpunit/phpunit:7.5.17 --no-update
-
-      - run:
           name: Run tests / Lowest
           command: |
             composer update -n --prefer-dist --prefer-lowest --no-suggest
@@ -36,11 +31,6 @@ jobs:
     working_directory: ~/project
     steps:
       - checkout
-
-      - run:
-          name: Install PHPUnit
-          command: |
-            composer require phpunit/phpunit:7.5.17 --no-update
 
       - run:
           name: Run tests / Highest

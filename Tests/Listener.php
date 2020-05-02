@@ -24,6 +24,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 
 /**
@@ -140,6 +141,21 @@ class Listener
         return (resolve($event))
             ->then(function (ViewEvent $event) {
                 $event->setResponse(new JsonResponse($event->getControllerResult()));
+            });
+    }
+
+    /**
+     * Handle response.
+     *
+     * @param ResponseEvent $event
+     */
+    public function handleResponseEvent(ResponseEvent $event)
+    {
+        return (resolve($event))
+            ->then(function (ResponseEvent $event) {
+                if ($event->getRequest()->query->has('replace_response')) {
+                    $event->setResponse(new Response('response_replaced'));
+                }
             });
     }
 
