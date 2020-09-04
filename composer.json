@@ -23,6 +23,7 @@
     "require-dev": {
         "phpunit/phpunit": "7.5.17",
         "mmoreram/base-bundle": "^2.1.0",
+        "drift/react-functions": "^0.1",
         "symfony/yaml": "^5.0",
         "symfony/console": "^5.0"
     },
