@@ -1,5 +1,17 @@
 <?php
 
+/*
+ * This file is part of the DriftPHP Project
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * Feel free to edit as you please, and have fun.
+ *
+ * @author Marc Morera <yuhu@mmoreram.com>
+ */
+
+declare(strict_types=1);
 
 namespace Drift\HttpKernel\DependencyInjection\CompilerPass;
 
@@ -11,7 +23,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Class PeriodicTimersCompilerPass
+ * Class PeriodicTimersCompilerPass.
  */
 class PeriodicTimersCompilerPass implements CompilerPassInterface
 {
@@ -25,7 +37,7 @@ class PeriodicTimersCompilerPass implements CompilerPassInterface
         $servicesId = $container->findTaggedServiceIds('periodic_timer');
 
         $periodicTimer = new Definition(PeriodicTimer::class, [
-            new Reference(LoopInterface::class)
+            new Reference(LoopInterface::class),
         ]);
 
         foreach ($servicesId as $serviceId => $serviceRows) {
@@ -40,13 +52,13 @@ class PeriodicTimersCompilerPass implements CompilerPassInterface
                 $periodicTimer->addMethodCall('addServiceCall', [
                     $frequency,
                     new Reference($serviceId),
-                    $method
+                    $method,
                 ]);
             }
         }
 
         $periodicTimer->addTag('kernel.event_listener', [
-            'event' => 'kernel.preload'
+            'event' => 'kernel.preload',
         ]);
 
         $container->setDefinition(PeriodicTimer::class, $periodicTimer);
