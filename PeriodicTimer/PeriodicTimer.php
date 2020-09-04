@@ -18,7 +18,7 @@ namespace Drift\HttpKernel\PeriodicTimer;
 use React\EventLoop\LoopInterface;
 
 /**
- * Class PeriodicTimer
+ * Class PeriodicTimer.
  */
 final class PeriodicTimer
 {
@@ -37,18 +37,17 @@ final class PeriodicTimer
 
     /**
      * @param float  $frequencyInSeconds
-     * @param Object $service
+     * @param object $service
      * @param string $method
      */
     public function addServiceCall(
         float $frequencyInSeconds,
-        Object $service,
+        object $service,
         string $method
-    )
-    {
+    ) {
         $this
             ->loop
-            ->addPeriodicTimer($frequencyInSeconds, function() use ($service, $method) {
+            ->addPeriodicTimer($frequencyInSeconds, function () use ($service, $method) {
                 $service->$method();
             });
     }

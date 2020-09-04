@@ -16,9 +16,9 @@ declare(strict_types=1);
 namespace Drift\HttpKernel\Tests;
 
 use Exception;
+use React\Promise\PromiseInterface;
 use function React\Promise\reject;
 use function React\Promise\resolve;
-use React\Promise\PromiseInterface;
 use RingCentral\Psr7\Response as Psr7Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;

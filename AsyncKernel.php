@@ -22,12 +22,12 @@ use Drift\HttpKernel\DependencyInjection\CompilerPass\FilesystemCompilerPass;
 use Drift\HttpKernel\DependencyInjection\CompilerPass\PeriodicTimersCompilerPass;
 use Drift\HttpKernel\Exception\AsyncHttpKernelNeededException;
 use Exception;
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Reference;
-use function React\Promise\reject;
 use React\Promise\PromiseInterface;
+use function React\Promise\reject;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Kernel;
 
@@ -93,7 +93,6 @@ abstract class AsyncKernel extends Kernel implements CompilerPassInterface
         $container->addCompilerPass(new EventDispatcherCompilerPass($this->isDebug()));
         $container->addCompilerPass(new FilesystemCompilerPass());
         $container->addCompilerPass(new AsyncServicesCompilerPass());
-
     }
 
     /**
@@ -163,7 +162,7 @@ abstract class AsyncKernel extends Kernel implements CompilerPassInterface
                 $periodicTimer->addMethodCall('addServiceCall', [
                     $frequency,
                     new Reference($serviceId),
-                    $method
+                    $method,
                 ]);
             }
         }

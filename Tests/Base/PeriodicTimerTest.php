@@ -1,16 +1,27 @@
 <?php
 
+/*
+ * This file is part of the DriftPHP Project
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * Feel free to edit as you please, and have fun.
+ *
+ * @author Marc Morera <yuhu@mmoreram.com>
+ */
+
+declare(strict_types=1);
 
 namespace Drift\HttpKernel\Tests\Base;
 
-
+use function Clue\React\Block\await;
 use Drift\HttpKernel\Tests\AsyncKernelFunctionalTest;
 use Drift\HttpKernel\Tests\Services\ACounter;
-use function Clue\React\Block\await;
 use function Drift\React\usleep;
 
 /**
- * Class PeriodicTimerTest
+ * Class PeriodicTimerTest.
  */
 class PeriodicTimerTest extends AsyncKernelFunctionalTest
 {
@@ -46,7 +57,7 @@ class PeriodicTimerTest extends AsyncKernelFunctionalTest
                     'name' => 'periodic_timer',
                     'interval' => '0.7',
                     'method' => 'increaseX',
-                ]
+                ],
             ],
         ];
 
@@ -54,7 +65,7 @@ class PeriodicTimerTest extends AsyncKernelFunctionalTest
     }
 
     /**
-     * Test periodic timer
+     * Test periodic timer.
      */
     public function testPeriodicTimer()
     {

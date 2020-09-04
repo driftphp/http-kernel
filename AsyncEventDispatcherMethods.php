@@ -16,8 +16,8 @@ declare(strict_types=1);
 namespace Drift\HttpKernel;
 
 use Drift\HttpKernel\Event\DomainEventEnvelope;
-use function React\Promise\resolve;
 use React\Promise\PromiseInterface;
+use function React\Promise\resolve;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**

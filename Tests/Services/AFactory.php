@@ -15,9 +15,9 @@ declare(strict_types=1);
 
 namespace Drift\HttpKernel\Tests\Services;
 
-use function React\Promise\resolve;
 use React\EventLoop\LoopInterface;
 use React\Promise\PromiseInterface;
+use function React\Promise\resolve;
 
 /**
  * Class AService.
