@@ -19,8 +19,11 @@ use Drift\HttpKernel\DependencyInjection\CompilerPass\AsyncServicesCompilerPass;
 use Drift\HttpKernel\DependencyInjection\CompilerPass\EventDispatcherCompilerPass;
 use Drift\HttpKernel\DependencyInjection\CompilerPass\EventLoopCompilerPass;
 use Drift\HttpKernel\DependencyInjection\CompilerPass\FilesystemCompilerPass;
+use Drift\HttpKernel\DependencyInjection\CompilerPass\PeriodicTimersCompilerPass;
 use Drift\HttpKernel\Exception\AsyncHttpKernelNeededException;
 use Exception;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 use function React\Promise\reject;
 use React\Promise\PromiseInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -85,10 +88,12 @@ abstract class AsyncKernel extends Kernel implements CompilerPassInterface
      */
     public function build(ContainerBuilder $container)
     {
+        $container->addCompilerPass(new PeriodicTimersCompilerPass());
         $container->addCompilerPass(new EventLoopCompilerPass());
         $container->addCompilerPass(new EventDispatcherCompilerPass($this->isDebug()));
         $container->addCompilerPass(new FilesystemCompilerPass());
         $container->addCompilerPass(new AsyncServicesCompilerPass());
+
     }
 
     /**
@@ -133,5 +138,36 @@ abstract class AsyncKernel extends Kernel implements CompilerPassInterface
         }
 
         return $randomString;
+    }
+
+    /**
+     * You can modify the container here before it is dumped to PHP code.
+     *
+     * @param ContainerBuilder $container
+     */
+    public function processTimer(ContainerBuilder $container)
+    {
+        $servicesId = $container->findTaggedServiceIds('periodic_timer');
+
+        $periodicTimer = new Definition(PeriodicTimer::class);
+
+        foreach ($servicesId as $serviceId => $serviceRows) {
+            foreach ($serviceRows as $serviceRow) {
+                $frequency = $serviceRow['interval'];
+
+                if ($frequency <= 0) {
+                    throw new \Exception('You should define an interval value (in seconds) when defining a periodic timer');
+                }
+
+                $method = $serviceRow['method'];
+                $periodicTimer->addMethodCall('addServiceCall', [
+                    $frequency,
+                    new Reference($serviceId),
+                    $method
+                ]);
+            }
+        }
+
+        $container->setDefinition(PeriodicTimer::class, $periodicTimer);
     }
 }

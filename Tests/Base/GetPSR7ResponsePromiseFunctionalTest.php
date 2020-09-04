@@ -28,8 +28,6 @@ class GetPSR7ResponsePromiseFunctionalTest extends AsyncKernelFunctionalTest
 {
     /**
      * Everything should work as before in the world of sync requests.
-     *
-     * @group lele
      */
     public function testSyncKernel()
     {
