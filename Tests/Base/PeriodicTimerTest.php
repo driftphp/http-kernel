@@ -35,27 +35,30 @@ class PeriodicTimerTest extends AsyncKernelFunctionalTest
     protected static function decorateConfiguration(array $configuration): array
     {
         $configuration = parent::decorateConfiguration($configuration);
+        $configuration['parameters']['timer_freq_03'] = 0.3;
+        $configuration['parameters']['timer_freq_07'] = 0.7;
+        $configuration['parameters']['increase_2x'] = 'increase2x';
         $configuration['services'][ACounter::class] = [
             'class' => ACounter::class,
             'tags' => [
                 [
                     'name' => 'periodic_timer',
-                    'interval' => '0.1',
+                    'interval' => 0.1,
                     'method' => 'increaseI',
                 ],
                 [
                     'name' => 'periodic_timer',
-                    'interval' => '0.1',
+                    'interval' => 0.1,
                     'method' => 'increaseX',
                 ],
                 [
                     'name' => 'periodic_timer',
-                    'interval' => '0.3',
-                    'method' => 'increase2X',
+                    'interval' => '%timer_freq_03%',
+                    'method' => '%increase_2x%',
                 ],
                 [
                     'name' => 'periodic_timer',
-                    'interval' => '0.7',
+                    'interval' => '%timer_freq_07%',
                     'method' => 'increaseX',
                 ],
             ],
