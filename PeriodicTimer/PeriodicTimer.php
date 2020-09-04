@@ -51,4 +51,13 @@ final class PeriodicTimer
                 $service->$method();
             });
     }
+
+    /**
+     *
+     */
+    function onKernelPreload()
+    {
+        // Just an empty method to be called.
+        // The main goal are the previous calls
+    }
 }
