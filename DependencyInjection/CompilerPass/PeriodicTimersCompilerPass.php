@@ -20,6 +20,7 @@ use React\EventLoop\LoopInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -42,15 +43,11 @@ class PeriodicTimersCompilerPass implements CompilerPassInterface
 
         foreach ($servicesId as $serviceId => $serviceRows) {
             foreach ($serviceRows as $serviceRow) {
-                $frequency = $serviceRow['interval'];
+                $interval = $this->getParameterIfFormattedOrDefault($serviceRow['interval']);
+                $method = $this->getParameterIfFormattedOrDefault($serviceRow['method']);
 
-                if ($frequency <= 0) {
-                    throw new \Exception('You should define an interval value (in seconds) when defining a periodic timer');
-                }
-
-                $method = $serviceRow['method'];
                 $periodicTimer->addMethodCall('addServiceCall', [
-                    $frequency,
+                    $interval,
                     new Reference($serviceId),
                     $method,
                 ]);
@@ -62,5 +59,40 @@ class PeriodicTimersCompilerPass implements CompilerPassInterface
         ]);
 
         $container->setDefinition(PeriodicTimer::class, $periodicTimer);
+    }
+
+    /**
+     * Get as parameter reference if has format or default otherwise.
+     *
+     * @param mixed $value
+     *
+     * @return mixed
+     */
+    private function getParameterIfFormattedOrDefault($value)
+    {
+        if (!\is_string($value)) {
+            return $value;
+        }
+
+        return $this->hasParameterFormat($value)
+            ? new Parameter(trim($value, '%'))
+            : $value;
+    }
+
+    /**
+     * Has parameter format.
+     *
+     * @param string $string
+     *
+     * @return bool
+     */
+    private function hasParameterFormat(string $string): bool
+    {
+        $len = strlen($string);
+
+        return
+            ($len - 1 === strlen(rtrim($string, '%'))) &&
+            ($len - 1 === strlen(ltrim($string, '%')))
+        ;
     }
 }
