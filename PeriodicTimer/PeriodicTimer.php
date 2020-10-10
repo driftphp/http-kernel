@@ -52,10 +52,7 @@ final class PeriodicTimer
             });
     }
 
-    /**
-     *
-     */
-    function onKernelPreload()
+    public function onKernelPreload()
     {
         // Just an empty method to be called.
         // The main goal are the previous calls

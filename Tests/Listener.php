@@ -17,6 +17,7 @@ namespace Drift\HttpKernel\Tests;
 
 use Drift\HttpKernel\Event\DomainEventEnvelope;
 use Drift\HttpKernel\Event\PreloadEvent;
+use Drift\HttpKernel\Event\ShutdownEvent;
 use Drift\HttpKernel\Tests\Event\Event1;
 use React\Promise\PromiseInterface;
 use function React\Promise\resolve;
@@ -167,6 +168,16 @@ class Listener
     public function handlePreload(PreloadEvent $event)
     {
         $_GET['preloaded'] = true;
+    }
+
+    /**
+     * Handle shutdown.
+     *
+     * @param ShutdownEvent $event
+     */
+    public function handleShutdown(ShutdownEvent $event)
+    {
+        $_GET['shutdown'] = true;
     }
 
     /**

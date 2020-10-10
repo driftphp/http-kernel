@@ -22,9 +22,20 @@ final class AsyncKernelEvents
      * the first request is handled.
      *
      * This event allows you to load services in the dependency injection, to
-     * preload clients...
+     * preload clients, and so on.
      *
      * @Event("Drift\HttpKernel\Event\PreloadEvent")
      */
     const PRELOAD = 'kernel.preload';
+
+    /**
+     * The SHUTDOWN event occurs once the kernel is asked to be closed
+     * gracefully.
+     *
+     * This event allows you to flush elements from memory, close connections
+     * and so on.
+     *
+     * @Event("Drift\HttpKernel\Event\ShutdownEvent")
+     */
+    const SHUTDOWN = 'kernel.shutdown';
 }
