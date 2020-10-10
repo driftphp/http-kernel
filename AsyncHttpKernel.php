@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace Drift\HttpKernel;
 
 use Drift\HttpKernel\Event\PreloadEvent;
+use Drift\HttpKernel\Event\ShutdownEvent;
 use Drift\HttpKernel\Exception\AsyncEventDispatcherNeededException;
 use Exception;
 use React\Promise\PromiseInterface;
@@ -99,6 +100,16 @@ class AsyncHttpKernel extends HttpKernel
         return $this
             ->dispatcher
             ->asyncDispatch(new PreloadEvent(), AsyncKernelEvents::PRELOAD);
+    }
+
+    /**
+     * Shutdown kernel.
+     */
+    public function shutdown(): PromiseInterface
+    {
+        return $this
+            ->dispatcher
+            ->asyncDispatch(new ShutdownEvent(), AsyncKernelEvents::SHUTDOWN);
     }
 
     /**

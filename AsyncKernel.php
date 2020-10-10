@@ -64,6 +64,16 @@ abstract class AsyncKernel extends Kernel implements CompilerPassInterface
     }
 
     /**
+     * Shutdown kernel.
+     */
+    public function shutdown(): PromiseInterface
+    {
+        return $this
+            ->getHttpKernel()
+            ->shutdown();
+    }
+
+    /**
      * Handles a Request to convert it to a Response.
      *
      * When $catch is true, the implementation must catch all exceptions
