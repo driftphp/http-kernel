@@ -178,14 +178,14 @@ class AsyncHttpKernel extends HttpKernel
         }
 
         $event = new ControllerEvent($this, $controller, $request, $type);
-        $this->dispatcher->dispatch($event);
+        $this->dispatcher->dispatch($event, KernelEvents::CONTROLLER);
         $controller = $event->getController();
 
         // controller arguments
         $arguments = $this->argumentResolver->getArguments($request, $controller);
 
         $event = new ControllerArgumentsEvent($this, $controller, $arguments, $request, $type);
-        $this->dispatcher->dispatch($event);
+        $this->dispatcher->dispatch($event, KernelEvents::CONTROLLER_ARGUMENTS);
         $controller = $event->getController();
         $arguments = $event->getArguments();
 
