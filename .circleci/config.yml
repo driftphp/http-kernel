@@ -1,8 +1,8 @@
 version: 2
 jobs:
-  test-php73:
+  test-php74-no-stopwatch-lowest:
     docker:
-      - image: circleci/php:7.3-cli
+      - image: circleci/php:7.4-cli
 
     working_directory: ~/project
     steps:
@@ -23,7 +23,6 @@ jobs:
             rm -Rf var/*
             php vendor/bin/phpunit --testsuite=no-stopwatch
 
-
   test-php74:
     docker:
       - image: circleci/php:7.4-cli
@@ -35,7 +34,22 @@ jobs:
       - run:
           name: Run tests / Highest
           command: |
-            composer update -n --prefer-dist --no-suggest
+            composer update -n --prefer-dist
+            rm -Rf var/*
+            php vendor/bin/phpunit --testsuite=base
+
+  test-php80:
+    docker:
+      - image: circleci/php:8.0-cli
+
+    working_directory: ~/project
+    steps:
+      - checkout
+
+      - run:
+          name: Run tests / Highest
+          command: |
+            composer update -n --prefer-dist --ignore-platform-req=php
             rm -Rf var/*
             php vendor/bin/phpunit --testsuite=base
 
@@ -43,5 +57,6 @@ workflows:
   version: 2
   test:
     jobs:
-      - test-php73
+      - test-php74-no-stopwatch-lowest
       - test-php74
+      - test-php80
