@@ -49,12 +49,9 @@ use Throwable;
  */
 class AsyncHttpKernel extends HttpKernel
 {
-    /**
-     * @var AsyncEventDispatcher
-     */
-    protected $dispatcher;
-    protected $resolver;
-    private $argumentResolver;
+    private AsyncEventDispatcherInterface $localDispatcher;
+    private ControllerResolverInterface $localResolver;
+    private ?ArgumentResolverInterface $argumentResolver;
 
     /**
      * AsyncHttpKernel constructor.
@@ -76,8 +73,8 @@ class AsyncHttpKernel extends HttpKernel
             throw new AsyncEventDispatcherNeededException(sprintf('The EventDispatcher instance is not a valid %s instance. %s passed.', AsyncEventDispatcherInterface::class, get_class($this->dispatcher)));
         }
 
-        $this->dispatcher = $dispatcher;
-        $this->resolver = $resolver;
+        $this->localDispatcher = $dispatcher;
+        $this->localResolver = $resolver;
         $this->argumentResolver = $argumentResolver;
 
         if (null === $this->argumentResolver) {
@@ -98,7 +95,7 @@ class AsyncHttpKernel extends HttpKernel
     public function preload(): PromiseInterface
     {
         return $this
-            ->dispatcher
+            ->localDispatcher
             ->asyncDispatch(new PreloadEvent(), AsyncKernelEvents::PRELOAD);
     }
 
@@ -108,7 +105,7 @@ class AsyncHttpKernel extends HttpKernel
     public function shutdown(): PromiseInterface
     {
         return $this
-            ->dispatcher
+            ->localDispatcher
             ->asyncDispatch(new ShutdownEvent(), AsyncKernelEvents::SHUTDOWN);
     }
 
@@ -145,12 +142,11 @@ class AsyncHttpKernel extends HttpKernel
      */
     private function handleAsyncRaw(Request $request): PromiseInterface
     {
-        $dispatcher = $this->dispatcher;
         $type = self::MASTER_REQUEST;
-
         $event = new RequestEvent($this, $request, $type);
 
-        return $dispatcher
+        return $this
+            ->localDispatcher
             ->asyncDispatch($event, KernelEvents::REQUEST)
             ->then(function (RequestEvent $event) use ($request, $type) {
                 return $event->hasResponse()
@@ -173,7 +169,7 @@ class AsyncHttpKernel extends HttpKernel
      */
     private function callAsyncController(Request $request, int $type): PromiseInterface
     {
-        if (false === $controller = $this->resolver->getController($request)) {
+        if (false === $controller = $this->localResolver->getController($request)) {
             throw new NotFoundHttpException(sprintf('Unable to find the controller for path "%s". The route is wrongly configured.', $request->getPathInfo()));
         }
 
@@ -230,7 +226,7 @@ class AsyncHttpKernel extends HttpKernel
                 $event = new ViewEvent($this, $request, $type, $response);
 
                 return $this
-                    ->dispatcher
+                    ->localDispatcher
                     ->asyncDispatch($event, KernelEvents::VIEW)
                     ->then(function (ViewEvent $event) use ($controller, $response) {
                         if ($event->hasResponse()) {
@@ -264,7 +260,7 @@ class AsyncHttpKernel extends HttpKernel
         $event = new ResponseEvent($this, $request, $type, $response);
 
         return $this
-            ->dispatcher
+            ->localDispatcher
             ->asyncDispatch($event, KernelEvents::RESPONSE)
             ->then(function (ResponseEvent $event) {
                 return $event->getResponse();
@@ -300,7 +296,7 @@ class AsyncHttpKernel extends HttpKernel
         $event = new ExceptionEvent($this, $request, $type, $exception);
 
         return $this
-            ->dispatcher
+            ->localDispatcher
             ->asyncDispatch($event, KernelEvents::EXCEPTION)
             ->then(function (ExceptionEvent $event) use ($request, $type) {
                 // Supporting both 4.3 and 5.0

@@ -22,9 +22,6 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 final class DomainEventEnvelope extends Event
 {
-    /**
-     * @var object
-     */
     private $domainEvent;
 
     /**

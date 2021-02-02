@@ -22,10 +22,7 @@ use React\EventLoop\LoopInterface;
  */
 final class PeriodicTimer
 {
-    /**
-     * @var LoopInterface
-     */
-    private $loop;
+    private LoopInterface $loop;
 
     /**
      * @param LoopInterface $loop

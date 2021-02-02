@@ -13,7 +13,7 @@
 
 declare(strict_types=1);
 
-namespace Drift\HttpKernel\Tests\NoStopwatch;
+namespace Drift\HttpKernel\Tests\WithStopwatch;
 
 use Drift\HttpKernel\Tests\Base\AsyncDebugFunctionalTest as BaseTest;
 
@@ -29,6 +29,6 @@ class AsyncDebugFunctionalTest extends BaseTest
      */
     protected static function environment(): string
     {
-        return 'devnostopwatch';
+        return 'devwithstopwatch';
     }
 }

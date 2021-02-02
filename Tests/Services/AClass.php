@@ -15,6 +15,9 @@ declare(strict_types=1);
 
 namespace Drift\HttpKernel\Tests\Services;
 
+/**
+ * Class AClass.
+ */
 final class AClass
 {
 }

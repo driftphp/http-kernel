@@ -25,8 +25,6 @@ use React\Promise\PromiseInterface;
 class AsyncServiceAwaiter
 {
     /**
-     * Await.
-     *
      * @param LoopInterface $loop
      * @param object        $service
      *

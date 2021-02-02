@@ -26,12 +26,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class EventDispatcherCompilerPass implements CompilerPassInterface
 {
-    /**
-     * @var bool
-     *
-     * Is debug
-     */
-    private $isDebug;
+    private bool $isDebug;
 
     /**
      * EventDispatcherCompilerPass constructor.

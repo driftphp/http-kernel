@@ -13,7 +13,7 @@
 
 declare(strict_types=1);
 
-namespace Drift\HttpKernel\Tests\NoStopwatch;
+namespace Drift\HttpKernel\Tests\WithStopwatch;
 
 use Drift\HttpKernel\Tests\Base\AutowiringDebugTest as BaseTest;
 use Drift\HttpKernel\Tests\Services\AService;
@@ -30,7 +30,7 @@ class AutowiringDebugTest extends BaseTest
      */
     protected static function environment(): string
     {
-        return 'devnostopwatch';
+        return 'devwithstopwatch';
     }
 
     /**

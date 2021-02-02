@@ -36,10 +36,7 @@ use Symfony\Component\HttpKernel\Kernel;
  */
 abstract class AsyncKernel extends Kernel implements CompilerPassInterface
 {
-    /**
-     * @var string
-     */
-    private $uid;
+    private string $uid;
 
     /**
      * {@inheritdoc}
