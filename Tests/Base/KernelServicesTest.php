@@ -18,6 +18,7 @@ namespace Drift\HttpKernel\Tests\Base;
 use Drift\HttpKernel\Tests\AsyncKernelFunctionalTest;
 use React\EventLoop\LoopInterface;
 use React\Filesystem\Filesystem;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
 /**
  * Class KernelServicesTest.
@@ -25,9 +26,19 @@ use React\Filesystem\Filesystem;
 class KernelServicesTest extends AsyncKernelFunctionalTest
 {
     /**
-     * Test autowiring.
+     * @group without-filesystem
      */
-    public function testServices()
+    public function testServicesWithoutFilesystem()
+    {
+        $this->assertInstanceof(LoopInterface::class, $this->get('reactphp.event_loop'));
+        $this->expectException(ServiceNotFoundException::class);
+        $this->get('drift.filesystem');
+    }
+
+    /**
+     * @group with-filesystem
+     */
+    public function testServicesWithFilesystem()
     {
         $this->assertInstanceof(LoopInterface::class, $this->get('reactphp.event_loop'));
         $this->assertInstanceof(Filesystem::class, $this->get('drift.filesystem'));

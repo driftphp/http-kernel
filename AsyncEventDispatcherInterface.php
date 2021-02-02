@@ -24,15 +24,13 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 interface AsyncEventDispatcherInterface extends EventDispatcherInterface
 {
     /**
-     * Dispatch an event asynchronously.
-     *
-     * @param object $event
-     * @param string $eventName
+     * @param object      $event
+     * @param string|null $eventName
      *
      * @return PromiseInterface
      */
     public function asyncDispatch(
         $event,
         string $eventName = null
-    );
+    ): PromiseInterface;
 }

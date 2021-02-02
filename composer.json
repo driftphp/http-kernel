@@ -17,15 +17,17 @@
         "symfony/event-dispatcher-contracts": "^2.0",
         "react/promise": "^2.7",
         "react/http": "^1.0",
-        "react/filesystem": "^0.1",
         "clue/block-react": "^1.3"
     },
     "require-dev": {
-        "phpunit/phpunit": "7.5.17",
-        "mmoreram/base-bundle": "^2.1.0",
+        "phpunit/phpunit": "^9",
+        "mmoreram/base-bundle": "^2.3.0",
         "drift/react-functions": "^0.1",
         "symfony/yaml": "^5.0",
         "symfony/console": "^5.0"
+    },
+    "suggest": {
+        "react/filesystem": "*"
     },
     "autoload": {
         "psr-4": {

@@ -20,15 +20,8 @@ namespace Drift\HttpKernel\Tests\Services;
  */
 class ACounter
 {
-    /**
-     * @var int
-     */
-    private $i = 0;
-
-    /**
-     * @var int
-     */
-    private $x = 0;
+    private int $i = 0;
+    private int $x = 0;
 
     /**
      * Increase.

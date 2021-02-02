@@ -15,8 +15,8 @@
             <directory>./Tests/Base</directory>
         </testsuite>
 
-        <testsuite name="no-stopwatch">
-            <directory>./Tests/NoStopwatch</directory>
+        <testsuite name="with-stopwatch">
+            <directory>./Tests/WithStopwatch</directory>
         </testsuite>
     </testsuites>
 </phpunit>

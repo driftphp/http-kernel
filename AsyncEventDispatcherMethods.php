@@ -26,17 +26,15 @@ use Symfony\Contracts\EventDispatcher\Event;
 trait AsyncEventDispatcherMethods
 {
     /**
-     * Dispatch an event asynchronously.
-     *
-     * @param object $event
-     * @param string $eventName
+     * @param object      $event
+     * @param string|null $eventName
      *
      * @return PromiseInterface
      */
     public function asyncDispatch(
         $event,
         string $eventName = null
-    ) {
+    ): PromiseInterface {
         $eventName = $eventName ?? \get_class($event);
         $dispatchableEvent = $event instanceof Event
             ? $event

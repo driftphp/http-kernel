@@ -24,10 +24,7 @@ use function React\Promise\resolve;
  */
 final class AFactory
 {
-    /**
-     * @var LoopInterface
-     */
-    private $loop;
+    private LoopInterface $loop;
 
     /**
      * AFactory constructor.

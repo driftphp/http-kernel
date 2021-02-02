@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  test-php74-no-stopwatch-lowest:
+  test-php74-no-filesystem:
     docker:
       - image: circleci/php:7.4-cli
 
@@ -9,21 +9,14 @@ jobs:
       - checkout
 
       - run:
-          name: Run tests / Lowest
+          name: Run tests / Lowest + Stopwatch
           command: |
-            composer update -n --prefer-dist --prefer-lowest --no-suggest
-            rm -Rf var/*
-            php vendor/bin/phpunit --testsuite=base
-
-      - run:
-          name: Run tests / Highest + No Stopwatch
-          command: |
-            composer require symfony/stopwatch:^5.0
+            composer require symfony/stopwatch:^5.0 --no-update
             composer update -n --prefer-dist --no-suggest
             rm -Rf var/*
-            php vendor/bin/phpunit --testsuite=no-stopwatch
+            php vendor/bin/phpunit --testsuite=with-stopwatch --exclude-group=with-filesystem
 
-  test-php74:
+  test-php74-filesystem:
     docker:
       - image: circleci/php:7.4-cli
 
@@ -34,11 +27,12 @@ jobs:
       - run:
           name: Run tests / Highest
           command: |
+            composer require react/filesystem:^0.1 --no-update
             composer update -n --prefer-dist
             rm -Rf var/*
-            php vendor/bin/phpunit --testsuite=base
+            php vendor/bin/phpunit --testsuite=base --exclude-group=without-filesystem
 
-  test-php80:
+  test-php80-no-filesystem:
     docker:
       - image: circleci/php:8.0-cli
 
@@ -49,14 +43,14 @@ jobs:
       - run:
           name: Run tests / Highest
           command: |
-            composer update -n --prefer-dist --ignore-platform-req=php
+            composer update -n --prefer-dist
             rm -Rf var/*
-            php vendor/bin/phpunit --testsuite=base
+            php vendor/bin/phpunit --testsuite=base --exclude-group=with-filesystem
 
 workflows:
   version: 2
   test:
     jobs:
-      - test-php74-no-stopwatch-lowest
-      - test-php74
-      - test-php80
+      - test-php74-no-filesystem
+      - test-php74-filesystem
+      - test-php80-no-filesystem

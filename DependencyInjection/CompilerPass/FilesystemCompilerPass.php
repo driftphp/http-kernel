@@ -33,6 +33,10 @@ class FilesystemCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
+        if (!class_exists(Filesystem::class)) {
+            return;
+        }
+
         /*
          * Create a filesystem instance
          */
