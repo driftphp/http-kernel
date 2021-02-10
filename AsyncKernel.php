@@ -48,6 +48,16 @@ abstract class AsyncKernel extends Kernel implements CompilerPassInterface
             $this->uid = $this->generateUID();
         }
 
+        $fs = new Filesystem();
+        // AsyncKernel loads the container only once when it loads. Storing it in the filesystem is not for cache purposes
+        // but more for using the same loading process as Kernel class use.
+        // Hence, everytime before AsyncKernel initiates the container it deletes the cache dir,
+        // to make sure it is building the updated kernel
+        $cachePath = $this->getCacheDir();
+        if ($fs->exists($cachePath)) {
+            $fs->remove($cachePath);
+        }
+
         parent::boot();
     }
 
@@ -176,27 +186,5 @@ abstract class AsyncKernel extends Kernel implements CompilerPassInterface
         }
 
         $container->setDefinition(PeriodicTimer::class, $periodicTimer);
-    }
-
-    /**
-     * Initializes the service container.
-     *
-     * The cached version of the service container is used when fresh, otherwise the
-     * container is built.
-     */
-    protected function initializeContainer()
-    {
-        $fs = new Filesystem();
-        // AsyncKernel loads the container only once when it loads. Storing it in the filesystem is not for cache purposes
-        // but more for using the same loading process as Kernel class use.
-        // Hence, everytime before AsyncKernel initiates the container it deletes the cache dir,
-        // to make sure it is building the updated kernel
-        $cachePath = $this->getCacheDir();
-        if ($fs->exists($cachePath)) {
-            $fs->remove($cachePath);
-        }
-
-        // initialize the kernel
-        parent::initializeContainer();
     }
 }
