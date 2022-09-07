@@ -38,7 +38,25 @@ class KernelCacheTest extends AsyncKernelFunctionalTest
         unset($_ENV['DRIFT_CACHE_ENABLED']);
     }
 
-    public function testWithCache()
+    public function testWithCacheFromStaticSetting()
+    {
+        static::$kernel = static::getKernel();
+        static::$kernel->forceCacheUsage();
+        static::$kernel->boot();
+
+        $cacheDir = self::$kernel->getCacheDir();
+        $firstKernelCacheCreationTime = lstat($cacheDir)['ctime'];
+        sleep(1);
+
+        static::$kernel = static::getKernel();
+        static::$kernel->forceCacheUsage();
+        $cacheDir = self::$kernel->getCacheDir();
+        $secondKernelCacheCreationTime = lstat($cacheDir)['ctime'];
+
+        $this->assertEquals($firstKernelCacheCreationTime, $secondKernelCacheCreationTime);
+    }
+
+    public function testWithCacheWithEnv()
     {
         $_ENV['DRIFT_CACHE_ENABLED'] = '1';
         static::setUpBeforeClass();

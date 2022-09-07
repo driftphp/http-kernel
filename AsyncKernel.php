@@ -39,6 +39,15 @@ use Symfony\Component\HttpKernel\Kernel;
 abstract class AsyncKernel extends Kernel implements CompilerPassInterface
 {
     private string $uid;
+    private bool $forceCacheUsage = false;
+
+    /**
+     * @return void
+     */
+    public function forceCacheUsage()
+    {
+        $this->forceCacheUsage = true;
+    }
 
     /**
      * {@inheritdoc}
@@ -48,7 +57,7 @@ abstract class AsyncKernel extends Kernel implements CompilerPassInterface
         if (!$this->booted) {
             $this->uid = $this->generateUID();
 
-            if (($_ENV['DRIFT_CACHE_ENABLED'] ?? '0') !== '1') {
+            if (!$this->forceCacheUsage && ($_ENV['DRIFT_CACHE_ENABLED'] ?? '0') !== '1') {
                 $fs = new Filesystem();
                 // AsyncKernel loads the container only once when it loads. Storing it in the filesystem is not for cache purposes
                 // but more for using the same loading process as Kernel class use.
