@@ -41,7 +41,7 @@ final class AFactory
      */
     public static function createAFulfilledClass(): PromiseInterface
     {
-        return (resolve())
+        return (resolve(null))
             ->then(function () {
                 return new AClass();
             });
@@ -52,7 +52,7 @@ final class AFactory
      */
     public static function createARejectedClass(): PromiseInterface
     {
-        return (resolve())
+        return (resolve(null))
             ->then(function () {
                 throw new \Exception();
             });

@@ -16,9 +16,9 @@ jobs:
             rm -Rf var/*
             php vendor/bin/phpunit --testsuite=with-stopwatch --exclude-group=with-filesystem
 
-  test-php74-filesystem:
+  test-php80-no-filesystem:
     docker:
-      - image: circleci/php:7.4-cli
+      - image: circleci/php:8.0-cli
 
     working_directory: ~/project
     steps:
@@ -27,14 +27,28 @@ jobs:
       - run:
           name: Run tests / Highest
           command: |
-            composer require react/filesystem:^0.1 --no-update
             composer update -n --prefer-dist
             rm -Rf var/*
-            php vendor/bin/phpunit --testsuite=base --exclude-group=without-filesystem
+            php vendor/bin/phpunit --testsuite=base --exclude-group=with-filesystem
 
-  test-php80-no-filesystem:
+  test-php81-no-filesystem:
     docker:
-      - image: circleci/php:8.0-cli
+      - image: cimg/php:8.1
+
+    working_directory: ~/project
+    steps:
+      - checkout
+
+      - run:
+          name: Run tests / Highest
+          command: |
+            composer update -n --prefer-dist
+            rm -Rf var/*
+            php vendor/bin/phpunit --testsuite=base --exclude-group=with-filesystem
+
+  test-php82-no-filesystem:
+    docker:
+      - image: cimg/php:8.2
 
     working_directory: ~/project
     steps:
@@ -52,5 +66,6 @@ workflows:
   test:
     jobs:
       - test-php74-no-filesystem
-      - test-php74-filesystem
       - test-php80-no-filesystem
+      - test-php81-no-filesystem
+      - test-php82-no-filesystem

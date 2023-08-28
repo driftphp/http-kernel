@@ -221,7 +221,7 @@ class AsyncHttpKernel extends HttpKernel
         int $type
     ): PromiseInterface {
         return
-            (resolve())
+            (resolve(null))
             ->then(function () use ($request, $response, $controller, $type) {
                 $event = new ViewEvent($this, $request, $type, $response);
 
