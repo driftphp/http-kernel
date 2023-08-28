@@ -68,7 +68,7 @@ trait AsyncEventDispatcherMethods
         string $eventName,
         Event $event
     ) {
-        $promise = resolve();
+        $promise = resolve(null);
         foreach ($listeners as $listener) {
             $promise = $promise->then(function () use ($event, $eventName, $listener) {
                 return

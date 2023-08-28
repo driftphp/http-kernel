@@ -42,7 +42,7 @@ class Listener
      */
     public function handleGetResponsePromiseA(RequestEvent $event)
     {
-        return (resolve())
+        return (resolve(null))
             ->then(function () use ($event) {
                 $event->setResponse(new Response('A'));
             });
@@ -57,7 +57,7 @@ class Listener
      */
     public function handleGetResponsePromiseB(RequestEvent $event)
     {
-        return (resolve())
+        return (resolve(null))
             ->then(function () use ($event) {
                 $event->setResponse(new Response('B'));
             });
@@ -90,7 +90,7 @@ class Listener
      */
     public function handleGetExceptionA(ExceptionEvent $event)
     {
-        return (resolve())
+        return (resolve(null))
             ->then(function () use ($event) {
                 $event->setResponse(new Response('EXC', 404));
             });
@@ -106,7 +106,7 @@ class Listener
     public function handleGetResponsePromise1(RequestEvent $event): PromiseInterface
     {
         return
-            (resolve())
+            (resolve(null))
                 ->then(function () {
                     $_GET['partial'] .= '1';
                 });
